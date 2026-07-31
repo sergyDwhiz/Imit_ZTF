@@ -171,8 +171,6 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 .done[data-on="true"]{display:block}
 .done h2{font-family:var(--display);font-size:clamp(1.7rem,3.6vw,2.5rem);font-weight:400;margin:0 0 1.4rem}
 .done p{color:var(--muted);margin:0 auto 2rem;max-width:44ch}
-.ticket{font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;color:var(--seal);
-  border:1px solid var(--rule);padding:.8rem 1.5rem;display:inline-block;margin-bottom:1.6rem}
 .link-note{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--seal);margin:0 0 1.4rem}
 .confirm-panel{display:none;background:var(--band);border:1px solid var(--rule);
@@ -403,8 +401,6 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 <div class="done" id="done" data-on="false">
   <h2 data-i18n="doneTitle">Your accounts are recorded</h2>
   <p class="link-note" id="linkNote"></p>
-  <div class="ticket" id="ticket"></div>
-  <p data-i18n="doneBody">Keep this reference number. Your locality secretary can look the entry up with it.</p>
   <button type="button" class="btn ghost" id="againBtn" data-i18n="again">Fill another form</button>
 </div>
 
@@ -525,7 +521,6 @@ const I18N = {
     print:"Print",submit:"Submit the form",sending:"Sending",draftSaved:"Draft saved",
     yes:"Yes",no:"No",
     doneTitle:"Your accounts are recorded",
-    doneBody:"Keep this reference number. Your locality secretary can look the entry up with it.",
     again:"Fill another form",
     errName:"Enter your name before submitting.",
     errPhone:"Enter your phone number before submitting — it's what links this report to your next one.",
@@ -574,7 +569,6 @@ const I18N = {
     print:"Imprimer",submit:"Envoyer la fiche",sending:"Envoi en cours",draftSaved:"Brouillon enregistré",
     yes:"Oui",no:"Non",
     doneTitle:"Vos comptes sont enregistrés",
-    doneBody:"Conservez ce numéro de référence. Le secrétaire de votre localité peut retrouver la fiche avec ce numéro.",
     again:"Remplir une autre fiche",
     errName:"Entrez votre nom avant d'envoyer.",
     errPhone:"Entrez votre numéro de téléphone avant d'envoyer — c'est ce qui relie cette fiche à la prochaine.",
@@ -739,7 +733,6 @@ function showDone(data){
   $('#confirmPanel').dataset.on = 'false';
   $('#formArea').hidden = true;
   $('#foot').hidden = true;
-  $('#ticket').textContent = 'No. ' + data.id;
   $('#linkNote').textContent = data.is_new_person ? t.newPersonNote : t.linkedNote;
   $('#done').dataset.on = 'true';
   window.scrollTo({ top: 0 });
