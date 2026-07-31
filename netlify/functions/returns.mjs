@@ -79,16 +79,19 @@ export default async (req) => {
     row.person_id = resolved.person.id;
 
     try {
-      // One report per person per trimester. A repeat isn't blocked outright
+      // One goal and one result per person per trimester — those two are a
+      // pair, not duplicates of each other, so the check is scoped to the
+      // same entry_type. A repeat of the *same* type isn't blocked outright
       // (it might be a genuine correction) but must be explicitly confirmed.
       if (row.trimester_number != null && !body.confirm_duplicate) {
         const [dup] = await sql`
           SELECT id, submitted_at FROM accountability_returns
           WHERE person_id = ${resolved.person.id} AND trimester_number = ${row.trimester_number}
+            AND entry_type = ${row.entry_type}
           ORDER BY submitted_at DESC LIMIT 1
         `;
         if (dup) {
-          return json({ error: 'duplicate_trimester', existing: dup, trimester_number: row.trimester_number }, 409);
+          return json({ error: 'duplicate_trimester', existing: dup, trimester_number: row.trimester_number, entry_type: row.entry_type }, 409);
         }
       }
 
@@ -96,7 +99,7 @@ export default async (req) => {
         INSERT INTO accountability_returns ${sql(row)}
         RETURNING id, submitted_at
       `;
-      return json({ ...saved, person_id: resolved.person.id, is_new_person: resolved.isNew }, 201);
+      return json({ ...saved, person_id: resolved.person.id, is_new_person: resolved.isNew, entry_type: row.entry_type }, 201);
     } catch (err) {
       console.error('Insert failed:', err.message);
       return json({ error: 'insert_failed' }, 500);

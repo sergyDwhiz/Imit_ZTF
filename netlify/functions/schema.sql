@@ -116,6 +116,14 @@ ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS person_id BIGINT REF
 ALTER TABLE people ALTER COLUMN phone SET NOT NULL;
 ALTER TABLE accountability_returns ALTER COLUMN phone SET NOT NULL;
 
+-- A trimester has two distinct entries: the goal set beforehand and the
+-- actual result reported afterwards. They are a pair, not duplicates of
+-- each other — the "already submitted this trimester" check compares
+-- (person, trimester, entry_type), not just (person, trimester).
+ALTER TABLE accountability_returns
+    ADD COLUMN IF NOT EXISTS entry_type TEXT NOT NULL DEFAULT 'result'
+    CHECK (entry_type IN ('goal', 'result'));
+
 CREATE INDEX IF NOT EXISTS idx_returns_name
     ON accountability_returns (lower(full_name));
 CREATE INDEX IF NOT EXISTS idx_returns_period
@@ -124,6 +132,8 @@ CREATE INDEX IF NOT EXISTS idx_returns_province
     ON accountability_returns (spiritual_province);
 CREATE INDEX IF NOT EXISTS idx_returns_person
     ON accountability_returns (person_id, submitted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_returns_person_trimester_type
+    ON accountability_returns (person_id, trimester_number, entry_type);
 CREATE INDEX IF NOT EXISTS idx_people_phone
     ON people (phone);
 
@@ -137,6 +147,7 @@ SELECT
     r.id,
     r.submitted_at,
     r.person_id,
+    r.entry_type,
     r.full_name,
     r.phone,
     r.locality,

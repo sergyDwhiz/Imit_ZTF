@@ -43,6 +43,12 @@ body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--body);
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .lang button+button{border-left:1px solid var(--ink)}
 
+.entry-toggle{display:flex;border:1px solid var(--seal);margin-bottom:.8rem;width:fit-content}
+.et-btn{font-family:var(--mono);font-size:.8rem;font-weight:700;letter-spacing:.06em;
+  padding:.65rem 1.3rem;background:none;border:0;cursor:pointer;color:var(--seal)}
+.et-btn[aria-pressed="true"]{background:var(--seal);color:var(--paper)}
+.et-btn+.et-btn{border-left:1px solid var(--seal)}
+
 .hero{padding:5rem 0 3.5rem}
 @media(min-width:820px){.hero{padding:7rem 0 4.5rem}}
 .eyebrow{margin:0 0 .8rem;font-family:var(--mono);font-size:.72rem;
@@ -234,6 +240,11 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 
     <section class="block" id="ident">
       <div class="block-body">
+        <div class="entry-toggle" role="group" aria-label="Entry type">
+          <button type="button" class="et-btn" data-type="goal" aria-pressed="false" data-i18n="entryGoal">This is a goal</button>
+          <button type="button" class="et-btn" data-type="result" aria-pressed="true" data-i18n="entryResult">This is a result</button>
+        </div>
+        <p class="hint" data-i18n="entryHint">A goal is what you're aiming for this trimester. A result is what actually happened, reported afterwards.</p>
         <div class="section-label" data-i18n="identLabel">Identification</div>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
@@ -486,12 +497,15 @@ const I18N = {
     ref:"Hebrews 13:7-8",
     verse:"Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.",
     begin:"Begin the form",railHead:"Entries",identLabel:"Identification",
+    entryGoal:"This is a goal",entryResult:"This is a result",
+    entryHint:"A goal is what you're aiming for this trimester. A result is what actually happened, reported afterwards.",
     phoneHint:"Your phone number links this report to your next one. Please use the same number every time.",
     confirmPrompt:"We found other reports using this phone number. Which of these is you?",
     confirmNone:"None of these — this is my first report",
     newPersonNote:"A new record was created for you.",
     linkedNote:"Linked to your existing record.",
-    duplicatePrompt:"You already have a submission for Trimester {n}, from {date}. Submit this one anyway?",
+    duplicatePrompt:"You already have a {type} for Trimester {n}, from {date}. Submit this one anyway?",
+    typeGoalNoun:"goal",typeResultNoun:"result",
     duplicateSubmit:"Submit anyway",
     duplicateCancel:"Cancel, let me check",
     name:"Name",phone:"Phone",phoneCode:"Country code",locality:"Locality",province:"Spiritual province or nation",
@@ -534,12 +548,15 @@ const I18N = {
     ref:"Hébreux 13:7-8",
     verse:"Souvenez-vous de vos conducteurs qui vous ont annoncé la parole de Dieu ; considérez quelle a été la fin de leur vie, et imitez leur foi. Jésus-Christ est le même hier, aujourd'hui, et éternellement.",
     begin:"Commencer la fiche",railHead:"Rubriques",identLabel:"Identification",
+    entryGoal:"Ceci est un objectif",entryResult:"Ceci est un résultat",
+    entryHint:"Un objectif est ce que vous visez pour ce trimestre. Un résultat est ce qui s'est réellement passé, rapporté après coup.",
     phoneHint:"Votre numéro de téléphone relie cette fiche à la prochaine. Utilisez le même numéro à chaque fois.",
     confirmPrompt:"Nous avons trouvé d'autres fiches utilisant ce numéro de téléphone. Laquelle est la vôtre ?",
     confirmNone:"Aucune de celles-ci — c'est ma première fiche",
     newPersonNote:"Un nouveau dossier a été créé pour vous.",
     linkedNote:"Lié à votre dossier existant.",
-    duplicatePrompt:"Vous avez déjà une fiche pour le trimestre {n}, datée du {date}. Envoyer quand même ?",
+    duplicatePrompt:"Vous avez déjà un {type} pour le trimestre {n}, daté du {date}. Envoyer quand même ?",
+    typeGoalNoun:"objectif",typeResultNoun:"résultat",
     duplicateSubmit:"Envoyer quand même",
     duplicateCancel:"Annuler, je vais vérifier",
     name:"Nom",phone:"Téléphone",phoneCode:"Indicatif du pays",locality:"Localité",province:"Province spirituelle ou nation",
@@ -581,6 +598,18 @@ const DRAFT_KEY = 'cmfi-draft-v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 let lang = (navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+
+// Kept separate from the per-answer draft (which clears after every submit)
+// so someone entering many goals in a row doesn't have to re-toggle it
+// each time — it only changes when they deliberately switch it.
+const ENTRY_TYPE_KEY = 'cmfi-entrytype-v1';
+let entryType = localStorage.getItem(ENTRY_TYPE_KEY) === 'goal' ? 'goal' : 'result';
+function applyEntryType(t){
+  entryType = t === 'goal' ? 'goal' : 'result';
+  $$('.et-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === entryType)));
+  try { localStorage.setItem(ENTRY_TYPE_KEY, entryType); } catch (e) {}
+}
+$$('.et-btn').forEach(b => b.addEventListener('click', () => { applyEntryType(b.dataset.type); saveDraft(); }));
 
 const ROMAN = ['i','ii','iii','iv','v','vi','vii','viii'];
 function litRow(i){
@@ -676,7 +705,7 @@ $('[name="phone_local"]').addEventListener('blur', function(){
 });
 
 function collect(){
-  const p = { form_language: lang };
+  const p = { form_language: lang, entry_type: entryType };
   $$('#sheet [name]').forEach(el => { p[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
   p.literature = Array.from($('#litBody').children).map(tr => ({
     title: tr.querySelector('.lit-title').value.trim(),
@@ -692,6 +721,7 @@ function collect(){
 function restore(p){
   if (!p) return;
   if (p.form_language) applyLang(p.form_language);
+  if (p.entry_type) applyEntryType(p.entry_type);
   if (Array.isArray(p.literature)) setLitRows(Math.max(4, p.literature.length));
   $$('#sheet [name]').forEach(el => {
     if (p[el.name] === undefined) return;
@@ -781,6 +811,7 @@ async function submitReturn(extra){
         say('', '');
         const dateStr = new Date(errBody.existing.submitted_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB');
         $('#confirmPromptText').textContent = t.duplicatePrompt
+          .replace('{type}', errBody.entry_type === 'goal' ? t.typeGoalNoun : t.typeResultNoun)
           .replace('{n}', errBody.trimester_number)
           .replace('{date}', dateStr);
         const choices = $('#confirmChoices');
@@ -834,6 +865,7 @@ document.addEventListener('input', () => { refreshRail(); saveDraft(); });
 document.addEventListener('change', () => { refreshRail(); saveDraft(); });
 
 applyLang(lang);
+applyEntryType(entryType);
 try {
   const saved = localStorage.getItem(DRAFT_KEY);
   if (saved) { restore(JSON.parse(saved)); refreshRail(); }

@@ -13,7 +13,7 @@ const sql = postgres(process.env.DATABASE_URL, {
 export default sql;
 
 export const COLUMNS = [
-  'form_language', 'full_name', 'phone', 'locality', 'spiritual_province',
+  'form_language', 'entry_type', 'full_name', 'phone', 'locality', 'spiritual_province',
   'trimester_number', 'month_from', 'month_to',
   'acct_walk_with_god', 'acct_studies', 'acct_finances', 'acct_service_to_god',
   'acct_given_to', 'acct_frequency',
@@ -93,6 +93,7 @@ export function buildRow(body) {
   const row = {};
   for (const c of COLUMNS) row[c] = coerce(c, body[c]);
   if (!['en', 'fr'].includes(row.form_language)) row.form_language = 'en';
+  if (!['goal', 'result'].includes(row.entry_type)) row.entry_type = 'result';
   return row;
 }
 
