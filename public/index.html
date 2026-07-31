@@ -407,7 +407,7 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 </div>
 
 <div class="confirm-panel" id="confirmPanel" data-on="false">
-  <p data-i18n="confirmPrompt">We found other reports using this phone number. Which of these is you?</p>
+  <p id="confirmPromptText"></p>
   <div class="confirm-choices" id="confirmChoices"></div>
 </div>
 
@@ -436,6 +436,9 @@ const I18N = {
     confirmNone:"None of these — this is my first report",
     newPersonNote:"A new record was created for you.",
     linkedNote:"Linked to your existing record.",
+    duplicatePrompt:"You already have a submission for Trimester {n}, from {date}. Submit this one anyway?",
+    duplicateSubmit:"Submit anyway",
+    duplicateCancel:"Cancel, let me check",
     name:"Name",phone:"Phone",locality:"Locality",province:"Spiritual province or nation",
     trimester:"Trimester",fromMonth:"From the month of",toMonth:"To the month of",
     h1:"I gave the accounts of",a1:"My walk with God",a2:"My studies",a3:"My finances",a4:"My service to God",
@@ -481,6 +484,9 @@ const I18N = {
     confirmNone:"Aucune de celles-ci — c'est ma première fiche",
     newPersonNote:"Un nouveau dossier a été créé pour vous.",
     linkedNote:"Lié à votre dossier existant.",
+    duplicatePrompt:"Vous avez déjà une fiche pour le trimestre {n}, datée du {date}. Envoyer quand même ?",
+    duplicateSubmit:"Envoyer quand même",
+    duplicateCancel:"Annuler, je vais vérifier",
     name:"Nom",phone:"Téléphone",locality:"Localité",province:"Province spirituelle ou nation",
     trimester:"Trimestre",fromMonth:"Du mois de",toMonth:"Au mois de",
     h1:"J'ai rendu compte de",a1:"Ma marche avec Dieu",a2:"Mes études",a3:"Mes finances",a4:"Mon service pour Dieu",
@@ -674,8 +680,10 @@ async function submitReturn(extra){
     if (!res.ok) {
       let errBody = null;
       try { errBody = await res.json(); } catch (e) {}
+
       if (res.status === 409 && errBody?.error === 'confirm_person') {
         say('', '');
+        $('#confirmPromptText').textContent = t.confirmPrompt;
         const choices = $('#confirmChoices');
         choices.innerHTML = '';
         errBody.candidates.forEach(c => {
@@ -696,6 +704,32 @@ async function submitReturn(extra){
         btn.disabled = false;
         return;
       }
+
+      if (res.status === 409 && errBody?.error === 'duplicate_trimester') {
+        say('', '');
+        const dateStr = new Date(errBody.existing.submitted_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB');
+        $('#confirmPromptText').textContent = t.duplicatePrompt
+          .replace('{n}', errBody.trimester_number)
+          .replace('{date}', dateStr);
+        const choices = $('#confirmChoices');
+        choices.innerHTML = '';
+        const again = document.createElement('button');
+        again.type = 'button';
+        again.textContent = t.duplicateSubmit;
+        again.addEventListener('click', () => submitReturn({ ...extra, confirm_duplicate: true }));
+        choices.appendChild(again);
+        const cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.className = 'none';
+        cancel.textContent = t.duplicateCancel;
+        cancel.addEventListener('click', () => { $('#confirmPanel').dataset.on = 'false'; });
+        choices.appendChild(cancel);
+        $('#confirmPanel').dataset.on = 'true';
+        $('#confirmPanel').scrollIntoView({ block: 'center' });
+        btn.disabled = false;
+        return;
+      }
+
       throw new Error('status ' + res.status);
     }
     showDone(await res.json());

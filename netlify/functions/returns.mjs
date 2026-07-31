@@ -73,6 +73,19 @@ export default async (req) => {
     row.person_id = resolved.person.id;
 
     try {
+      // One report per person per trimester. A repeat isn't blocked outright
+      // (it might be a genuine correction) but must be explicitly confirmed.
+      if (row.trimester_number != null && !body.confirm_duplicate) {
+        const [dup] = await sql`
+          SELECT id, submitted_at FROM accountability_returns
+          WHERE person_id = ${resolved.person.id} AND trimester_number = ${row.trimester_number}
+          ORDER BY submitted_at DESC LIMIT 1
+        `;
+        if (dup) {
+          return json({ error: 'duplicate_trimester', existing: dup, trimester_number: row.trimester_number }, 409);
+        }
+      }
+
       const [saved] = await sql`
         INSERT INTO accountability_returns ${sql(row)}
         RETURNING id, submitted_at
