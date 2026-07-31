@@ -172,6 +172,13 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 .done p{color:var(--muted);margin:0 auto 2rem;max-width:44ch}
 .ticket{font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;color:var(--seal);
   border:1px solid var(--rule);padding:.8rem 1.5rem;display:inline-block;margin-bottom:1.6rem}
+.member-id{display:none;margin:0 0 1.6rem}
+.member-id[data-on="true"]{display:block}
+.member-id .lbl{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.member-id .code{font-family:var(--mono);font-size:1.6rem;font-weight:700;letter-spacing:.14em;
+  color:var(--paper);background:var(--seal);border:1px solid var(--seal-dark);
+  padding:.6rem 1.6rem;display:inline-block}
 [hidden]{display:none!important}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
@@ -225,6 +232,10 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
     <section class="block" id="ident">
       <div class="block-body">
         <div class="section-label" data-i18n="identLabel">Identification</div>
+        <div class="row">
+          <label class="f lg"><span class="f-l" data-i18n="memberCode">Member ID (only if you have submitted before)</span><input class="f-i" name="member_code" autocomplete="off" placeholder="e.g. AB47K9"></label>
+        </div>
+        <p class="hint" data-i18n="memberCodeHint">Leave this blank the first time. You will be given an ID at the end to use for every report after this one.</p>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
           <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone" type="tel" autocomplete="tel"></label>
@@ -388,6 +399,7 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 
 <div class="done" id="done" data-on="false">
   <h2 data-i18n="doneTitle">Your accounts are recorded</h2>
+  <div class="member-id" id="memberIdOut" data-on="false"></div>
   <div class="ticket" id="ticket"></div>
   <p data-i18n="doneBody">Keep this reference number. Your locality secretary can look the entry up with it.</p>
   <button type="button" class="btn ghost" id="againBtn" data-i18n="again">Fill another form</button>
@@ -413,6 +425,10 @@ const I18N = {
     ref:"Hebrews 13:7-8",
     verse:"Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.",
     begin:"Begin the form",railHead:"Entries",identLabel:"Identification",
+    memberCode:"Member ID (only if you have submitted before)",
+    memberCodeHint:"Leave this blank the first time. You will be given an ID at the end to use for every report after this one.",
+    newMemberLbl:"Your Member ID — save it for next time",
+    returningMemberLbl:"Linked to your existing record",
     name:"Name",phone:"Phone",locality:"Locality",province:"Spiritual province or nation",
     trimester:"Trimester",fromMonth:"From the month of",toMonth:"To the month of",
     h1:"I gave the accounts of",a1:"My walk with God",a2:"My studies",a3:"My finances",a4:"My service to God",
@@ -444,6 +460,7 @@ const I18N = {
     again:"Fill another form",
     errName:"Enter your name before submitting.",
     errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
+    errMemberCode:"That Member ID was not found. Leave the field blank if this is your first report, or check the ID with your locality secretary.",
     months:["January","February","March","April","May","June","July","August","September","October","November","December"]
   },
   fr:{
@@ -453,6 +470,10 @@ const I18N = {
     ref:"Hébreux 13:7-8",
     verse:"Souvenez-vous de vos conducteurs qui vous ont annoncé la parole de Dieu ; considérez quelle a été la fin de leur vie, et imitez leur foi. Jésus-Christ est le même hier, aujourd'hui, et éternellement.",
     begin:"Commencer la fiche",railHead:"Rubriques",identLabel:"Identification",
+    memberCode:"Identifiant membre (seulement si vous avez déjà soumis une fiche)",
+    memberCodeHint:"Laissez ce champ vide la première fois. Un identifiant vous sera donné à la fin, à utiliser pour chaque fiche suivante.",
+    newMemberLbl:"Votre identifiant membre — conservez-le pour la prochaine fois",
+    returningMemberLbl:"Lié à votre dossier existant",
     name:"Nom",phone:"Téléphone",locality:"Localité",province:"Province spirituelle ou nation",
     trimester:"Trimestre",fromMonth:"Du mois de",toMonth:"Au mois de",
     h1:"J'ai rendu compte de",a1:"Ma marche avec Dieu",a2:"Mes études",a3:"Mes finances",a4:"Mon service pour Dieu",
@@ -484,6 +505,7 @@ const I18N = {
     again:"Remplir une autre fiche",
     errName:"Entrez votre nom avant d'envoyer.",
     errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
+    errMemberCode:"Cet identifiant membre est introuvable. Laissez le champ vide s'il s'agit de votre première fiche, ou vérifiez l'identifiant auprès du secrétaire de votre localité.",
     months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
   }
 };
@@ -637,13 +659,29 @@ $('#submitBtn').addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(collect())
     });
-    if (!res.ok) throw new Error('status ' + res.status);
+    if (!res.ok) {
+      let errBody = null;
+      try { errBody = await res.json(); } catch (e) {}
+      if (res.status === 404 && errBody?.error === 'member_code_not_found') {
+        say(t.errMemberCode, 'bad');
+        const mcField = $('[name="member_code"]');
+        mcField.scrollIntoView({ block: 'center' });
+        mcField.focus();
+        btn.disabled = false;
+        return;
+      }
+      throw new Error('status ' + res.status);
+    }
     const data = await res.json();
     clearDraft();
     say('', '');
     $('#formArea').hidden = true;
     $('#foot').hidden = true;
     $('#ticket').textContent = 'No. ' + data.id;
+    const mcOut = $('#memberIdOut');
+    mcOut.innerHTML = '<div class="lbl">' + (data.is_new_member ? t.newMemberLbl : t.returningMemberLbl) +
+      '</div><div class="code">' + data.member_code + '</div>';
+    mcOut.dataset.on = 'true';
     $('#done').dataset.on = 'true';
     window.scrollTo({ top: 0 });
   } catch (e) {

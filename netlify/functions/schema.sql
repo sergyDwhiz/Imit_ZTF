@@ -2,6 +2,17 @@
 -- Foundation Camp 2026 - Trimestral Accountability Form
 -- PostgreSQL schema
 
+-- One row per person. member_code is handed to them on their first
+-- submission and is the only way a later submission links back to this
+-- record (no login system, so no other identity check is done).
+CREATE TABLE IF NOT EXISTS people (
+    id                          BIGSERIAL PRIMARY KEY,
+    member_code                 TEXT NOT NULL UNIQUE,
+    full_name                   TEXT NOT NULL,
+    phone                       TEXT,
+    created_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS accountability_returns (
     id                          BIGSERIAL PRIMARY KEY,
     submitted_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -90,29 +101,38 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
     making_disciples            TEXT
 );
 
+-- Added after the initial release: links each return to a person so their
+-- trimestral reports stack up into one history instead of disconnected rows.
+ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS person_id BIGINT REFERENCES people(id);
+
 CREATE INDEX IF NOT EXISTS idx_returns_name
     ON accountability_returns (lower(full_name));
 CREATE INDEX IF NOT EXISTS idx_returns_period
     ON accountability_returns (trimester_number, submitted_at DESC);
 CREATE INDEX IF NOT EXISTS idx_returns_province
     ON accountability_returns (spiritual_province);
+CREATE INDEX IF NOT EXISTS idx_returns_person
+    ON accountability_returns (person_id, submitted_at DESC);
 
 -- Convenience view for the province secretaries
 CREATE OR REPLACE VIEW accountability_summary AS
 SELECT
-    id,
-    submitted_at,
-    full_name,
-    phone,
-    locality,
-    spiritual_province,
-    trimester_number,
-    ddeg_number,
-    bible_chapters,
-    people_reached,
-    conversions,
-    added_to_church,
-    fasts_wednesday + fasts_complete_3days AS total_fasts,
-    proclamations,
-    idols_uprooted
-FROM accountability_returns;
+    r.id,
+    r.submitted_at,
+    r.person_id,
+    pe.member_code,
+    r.full_name,
+    r.phone,
+    r.locality,
+    r.spiritual_province,
+    r.trimester_number,
+    r.ddeg_number,
+    r.bible_chapters,
+    r.people_reached,
+    r.conversions,
+    r.added_to_church,
+    r.fasts_wednesday + r.fasts_complete_3days AS total_fasts,
+    r.proclamations,
+    r.idols_uprooted
+FROM accountability_returns r
+LEFT JOIN people pe ON pe.id = r.person_id;

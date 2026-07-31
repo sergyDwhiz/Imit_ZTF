@@ -1,4 +1,5 @@
 import postgres from 'postgres';
+import { randomInt } from 'node:crypto';
 
 // One connection per Lambda container. Managed Postgres providers hand out a
 // pooled connection string; keeping max at 1 stops cold starts from exhausting it.
@@ -94,6 +95,15 @@ export function buildRow(body) {
   for (const c of COLUMNS) row[c] = coerce(c, body[c]);
   if (!['en', 'fr'].includes(row.form_language)) row.form_language = 'en';
   return row;
+}
+
+// Excludes 0/O/1/I/L so a handwritten or read-aloud code isn't ambiguous.
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+export function genMemberCode(length = 6) {
+  let code = '';
+  for (let i = 0; i < length; i++) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
+  return code;
 }
 
 export const json = (data, status = 200) =>
