@@ -1,0 +1,16 @@
+{
+  "name": "cmfi-accountability-form",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CMFI Foundation Camp 2026 trimestral accountability form",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

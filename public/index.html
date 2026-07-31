@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CMFI Trimestral Accountability Form</title>
+<meta name="description" content="Trimestral accountability form for the CMFI Foundation Camp 2026. School of Knowing and Serving God, Koume.">
+<meta name="theme-color" content="#7A1F2B">
+<meta property="og:title" content="CMFI Trimestral Accountability Form">
+<meta property="og:description" content="Foundation Camp 2026. Imitators of ZTF.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%237A1F2B'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23FCFCFA' text-anchor='middle'%3EZ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16211C; --paper:#FCFCFA; --band:#ECF2EA; --rule:#C3D4C4;
+  --seal:#7A1F2B; --seal-dark:#5E1621; --muted:#6C7A72; --canvas:#E7EBE5;
+  --display:"Newsreader",Georgia,serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --bar:56px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--bar) + 3rem)}
+body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--body);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+.topbar{position:sticky;top:0;z-index:60;height:var(--bar);
+  background:var(--paper);border-bottom:1px solid var(--rule)}
+.topbar .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.mark{display:flex;align-items:baseline;gap:.7rem;min-width:0}
+.mark b{font-family:var(--display);font-weight:600;font-size:1.05rem;letter-spacing:-.01em}
+.mark span{font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){.mark span{display:none}}
+.lang{display:flex;border:1px solid var(--ink);flex:0 0 auto}
+.lang button{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;
+  padding:.4rem .85rem;background:none;border:0;cursor:pointer;color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.lang button+button{border-left:1px solid var(--ink)}
+
+.hero{padding:5rem 0 3.5rem}
+@media(min-width:820px){.hero{padding:7rem 0 4.5rem}}
+.eyebrow{margin:0 0 .8rem;font-family:var(--mono);font-size:.72rem;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--seal)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.3rem,6.5vw,4.6rem);
+  line-height:1;margin:0;letter-spacing:-.02em;max-width:15ch}
+h1 em{font-style:italic;color:var(--seal)}
+.scripture{margin-top:3rem;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+  padding:1.7rem 0;display:grid;grid-template-columns:minmax(0,1fr);gap:.9rem}
+@media(min-width:820px){.scripture{grid-template-columns:8rem minmax(0,1fr);gap:2.5rem;align-items:start}}
+.scripture .ref{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--seal);padding-top:.6rem}
+.scripture p{margin:0;font-family:var(--display);font-style:italic;
+  font-size:clamp(1.1rem,2.3vw,1.5rem);line-height:1.45;max-width:60ch}
+.begin{margin-top:2.5rem}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;padding-bottom:1rem}
+@media(min-width:980px){.layout{grid-template-columns:5.5rem minmax(0,1fr);gap:2.5rem}}
+
+.rail{position:sticky;top:var(--bar);z-index:20;align-self:start;background:var(--canvas)}
+.rail-head,.rail-meter{display:none}
+.rail-list{display:flex;gap:.25rem;overflow-x:auto;padding:.6rem 0;scrollbar-width:none}
+.rail-list::-webkit-scrollbar{display:none}
+.rail-i{flex:0 0 auto;font-family:var(--mono);font-size:.72rem;width:2rem;height:2rem;
+  display:grid;place-items:center;border:1px solid var(--rule);background:var(--paper);
+  color:var(--muted);cursor:pointer;transition:background .18s,color .18s,border-color .18s}
+.rail-i:hover{border-color:var(--ink);color:var(--ink)}
+.rail-i[data-filled="true"]{background:var(--seal);border-color:var(--seal);color:#fff}
+.rail-i[data-here="true"]{outline:1px solid var(--ink);outline-offset:2px}
+.rail-i:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+@media(min-width:980px){
+  .rail{top:calc(var(--bar) + 2rem);background:none}
+  .rail-head{display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:.8rem}
+  .rail-list{flex-direction:column;overflow:visible;padding:0;gap:.3rem}
+  .rail-i{width:2.4rem;height:2.1rem}
+  .rail-meter{display:block;margin-top:1rem;width:2.4rem;border-top:1px solid var(--rule);
+    padding-top:.6rem;font-family:var(--mono);font-size:.72rem;color:var(--seal)}
+}
+
+.sheet{background:var(--paper);border:1px solid var(--rule)}
+.block{border-bottom:1px solid var(--rule)}
+.block:last-child{border-bottom:0}
+.block-body{padding:1.6rem 1.4rem}
+@media(min-width:700px){.block-body{padding:1.9rem 2.2rem}}
+.item{display:grid;grid-template-columns:minmax(0,1fr)}
+@media(min-width:700px){.item{grid-template-columns:3.75rem minmax(0,1fr)}}
+.item:nth-of-type(even){background:var(--band)}
+.item-n{display:none;font-family:var(--mono);font-size:.78rem;color:var(--seal);
+  padding:1.95rem 0 0 1.1rem;border-right:1px solid rgba(122,31,43,.22)}
+@media(min-width:700px){.item-n{display:block}}
+.item-b{padding:1.6rem 1.4rem}
+@media(min-width:700px){.item-b{padding:1.7rem 2.2rem}}
+h2{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:0 0 .35rem;letter-spacing:-.01em}
+h2 .n-inline{font-family:var(--mono);font-size:.8rem;color:var(--seal);margin-right:.5rem}
+@media(min-width:700px){h2 .n-inline{display:none}}
+.hint{margin:0 0 1rem;font-size:.82rem;color:var(--muted);max-width:64ch}
+.section-label{font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem}
+
+.row{display:flex;flex-wrap:wrap;gap:1.1rem 1.6rem}
+.row+.row{margin-top:1.1rem}
+.f{display:flex;flex-direction:column;gap:.3rem;flex:1 1 12rem;min-width:0}
+.f.sm{flex:0 1 7.5rem}
+.f.lg{flex:1 1 100%}
+.f-l{font-size:.78rem;color:var(--muted)}
+.f-i{font:inherit;font-family:var(--mono);font-size:.92rem;color:var(--ink);
+  background:transparent;border:0;border-bottom:1px solid var(--rule);
+  padding:.35rem .1rem;width:100%;border-radius:0;transition:border-color .16s,box-shadow .16s}
+.f-i::placeholder{color:#B4C0B6}
+.f-i:hover{border-bottom-color:var(--muted)}
+.f-i:focus{outline:0;border-bottom-color:var(--seal);box-shadow:0 1px 0 0 var(--seal)}
+select.f-i{appearance:none;cursor:pointer;padding-right:1.2rem;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 9px) 55%,calc(100% - 4px) 55%;
+  background-size:5px 5px;background-repeat:no-repeat}
+textarea.f-i{font-family:var(--body);font-size:.95rem;line-height:2rem;min-height:8.5rem;
+  resize:vertical;border:1px solid var(--rule);padding:.35rem .7rem;
+  background-image:repeating-linear-gradient(transparent,transparent 1.94rem,var(--rule) 1.94rem,var(--rule) 2rem);
+  background-attachment:local}
+textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
+.ticks{display:flex;flex-wrap:wrap;gap:.65rem 1.6rem;margin-bottom:1.2rem}
+.tick{display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;font-size:.92rem}
+.tick input{position:absolute;opacity:0;width:0;height:0}
+.tick .box{width:1.05rem;height:1.05rem;border:1px solid var(--ink);background:var(--paper);
+  display:grid;place-items:center;flex:0 0 auto}
+.tick .box::after{content:"";width:.55rem;height:.3rem;border-left:2px solid var(--seal);
+  border-bottom:2px solid var(--seal);transform:rotate(-45deg) scale(.4);opacity:0;
+  transition:opacity .14s,transform .14s}
+.tick input:checked+.box::after{opacity:1;transform:rotate(-45deg) scale(1)}
+.tick input:focus-visible+.box{outline:2px solid var(--seal);outline-offset:2px}
+.lit{width:100%;border-collapse:collapse;margin-bottom:.9rem;table-layout:fixed}
+.lit th{text-align:left;font-family:var(--mono);font-weight:400;font-size:.64rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  padding:0 .6rem .5rem 0;border-bottom:1px solid var(--rule)}
+.lit td{padding:.45rem .6rem .45rem 0;vertical-align:bottom}
+.lit td:first-child,.lit th:first-child{width:2.4rem;font-family:var(--mono);font-size:.78rem;color:var(--seal)}
+.add{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  background:none;border:1px solid var(--rule);color:var(--muted);padding:.45rem .8rem;cursor:pointer}
+.add:hover{border-color:var(--ink);color:var(--ink)}
+
+.btn{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
+  padding:.95rem 1.9rem;border:1px solid var(--seal);background:var(--seal);color:#fff;
+  cursor:pointer;transition:background .16s,color .16s}
+.btn:hover{background:var(--seal-dark);border-color:var(--seal-dark)}
+.btn:disabled{opacity:.5;cursor:progress}
+.btn.ghost{background:none;color:var(--ink);border-color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--paper)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.foot{margin-top:2.5rem;padding-bottom:5rem;display:flex;flex-wrap:wrap;gap:1.2rem;
+  align-items:center;justify-content:space-between}
+.colophon{font-family:var(--display);font-style:italic;font-size:.95rem;color:var(--muted);
+  max-width:34ch;margin:0}
+.actions{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.status{font-size:.85rem;min-height:1.2rem;max-width:34ch}
+.status[data-tone="ok"]{color:#1E5B36}
+.status[data-tone="bad"]{color:var(--seal)}
+.draft{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);opacity:0;transition:opacity .4s}
+.draft[data-on="true"]{opacity:1}
+
+.done{display:none;background:var(--paper);border:1px solid var(--rule);
+  padding:4.5rem 2rem;text-align:center;margin-bottom:5rem}
+.done[data-on="true"]{display:block}
+.done h2{font-family:var(--display);font-size:clamp(1.7rem,3.6vw,2.5rem);font-weight:400;margin:0 0 1.4rem}
+.done p{color:var(--muted);margin:0 auto 2rem;max-width:44ch}
+.ticket{font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;color:var(--seal);
+  border:1px solid var(--rule);padding:.8rem 1.5rem;display:inline-block;margin-bottom:1.6rem}
+[hidden]{display:none!important}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff}
+  .topbar,.rail,.actions,.status,.begin,.draft{display:none}
+  .hero{padding:0 0 2rem}
+  .sheet{border:0}
+  .item:nth-of-type(even){background:none}
+  .layout{display:block}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="mark">
+      <b>CMFI</b>
+      <span data-i18n="barSub">Foundation Camp 2026 / Imitators of ZTF</span>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="fr" aria-pressed="false">FR</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="org">Christian Missionary Fellowship International</p>
+    <h1><span data-i18n="titleA">Trimestral</span> <em data-i18n="titleB">Accountability</em> <span data-i18n="titleC">Form</span></h1>
+    <div class="scripture">
+      <div class="ref" data-i18n="ref">Hebrews 13:7-8</div>
+      <p data-i18n="verse">Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.</p>
+    </div>
+    <div class="begin"><button type="button" class="btn ghost" id="beginBtn" data-i18n="begin">Begin the form</button></div>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout" id="formArea">
+  <aside class="rail">
+    <div class="rail-head" data-i18n="railHead">Entries</div>
+    <div class="rail-list" id="rail"></div>
+    <div class="rail-meter"><span id="meter">0/17</span></div>
+  </aside>
+
+  <main class="sheet" id="sheet">
+
+    <section class="block" id="ident">
+      <div class="block-body">
+        <div class="section-label" data-i18n="identLabel">Identification</div>
+        <div class="row">
+          <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
+          <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone" type="tel" autocomplete="tel"></label>
+        </div>
+        <div class="row">
+          <label class="f"><span class="f-l" data-i18n="locality">Locality</span><input class="f-i" name="locality"></label>
+          <label class="f"><span class="f-l" data-i18n="province">Spiritual province or nation</span><input class="f-i" name="spiritual_province"></label>
+        </div>
+        <div class="row">
+          <label class="f sm"><span class="f-l" data-i18n="trimester">Trimester</span>
+            <select class="f-i" name="trimester_number"><option value=""></option><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+          <label class="f sm"><span class="f-l" data-i18n="fromMonth">From the month of</span><select class="f-i month" name="month_from"></select></label>
+          <label class="f sm"><span class="f-l" data-i18n="toMonth">To the month of</span><select class="f-i month" name="month_to"></select></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="block item" id="i1"><div class="item-n">01</div><div class="item-b">
+      <h2><span class="n-inline">01</span><span data-i18n="h1">I gave the accounts of</span></h2>
+      <div class="ticks">
+        <label class="tick"><input type="checkbox" name="acct_walk_with_god"><span class="box"></span><span data-i18n="a1">My walk with God</span></label>
+        <label class="tick"><input type="checkbox" name="acct_studies"><span class="box"></span><span data-i18n="a2">My studies</span></label>
+        <label class="tick"><input type="checkbox" name="acct_finances"><span class="box"></span><span data-i18n="a3">My finances</span></label>
+        <label class="tick"><input type="checkbox" name="acct_service_to_god"><span class="box"></span><span data-i18n="a4">My service to God</span></label>
+      </div>
+      <div class="row">
+        <label class="f"><span class="f-l" data-i18n="givenTo">To</span><input class="f-i" name="acct_given_to"></label>
+        <label class="f sm"><span class="f-l" data-i18n="every">Every</span><select class="f-i freq" name="acct_frequency"></select></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i2"><div class="item-n">02</div><div class="item-b">
+      <h2><span class="n-inline">02</span><span data-i18n="h2t">Daily dynamic encounters with God</span></h2>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="ddeg_number" inputmode="numeric"></label>
+        <label class="f"><span class="f-l" data-i18n="time">Time</span><input class="f-i" name="ddeg_time" data-i18n-ph="phTime" placeholder="e.g. 45 min"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i3"><div class="item-n">03</div><div class="item-b">
+      <h2><span class="n-inline">03</span><span data-i18n="h3t">Bible reading</span></h2>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="chapters">Chapters read</span><input class="f-i" name="bible_chapters" inputmode="numeric"></label>
+        <label class="f"><span class="f-l" data-i18n="timeReading">Time spent reading</span><input class="f-i" name="bible_time"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i4"><div class="item-n">04</div><div class="item-b">
+      <h2><span class="n-inline">04</span><span data-i18n="h4t">Bible memorisation</span></h2>
+      <div class="row"><label class="f lg"><span class="f-l" data-i18n="passages">Passages memorised</span><input class="f-i" name="bible_memorisation"></label></div>
+    </div></section>
+
+    <section class="block item" id="i5"><div class="item-n">05</div><div class="item-b">
+      <h2><span class="n-inline">05</span><span data-i18n="h5t">Reading of Christian literature</span></h2>
+      <p class="hint" data-i18n="h5h">Title of each book read, the number of pages, and the author.</p>
+      <table class="lit"><thead><tr><th></th><th data-i18n="lTitle">Title</th><th style="width:5rem" data-i18n="lPages">Pages</th><th data-i18n="lAuthor">Author</th></tr></thead><tbody id="litBody"></tbody></table>
+      <button type="button" class="add" id="addLit" data-i18n="addRow">Add a book</button>
+    </div></section>
+
+    <section class="block item" id="i6"><div class="item-n">06</div><div class="item-b">
+      <h2><span class="n-inline">06</span><span data-i18n="h6t">Prayer alone</span></h2>
+      <div class="row">
+        <label class="f"><span class="f-l" data-i18n="timeAlone">Time spent praying alone</span><input class="f-i" name="prayer_alone_time"></label>
+        <label class="f sm"><span class="f-l" data-i18n="retreats">15 minute retreats</span><input class="f-i" name="retreats_15min" inputmode="numeric"></label>
+      </div>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="thanks">Thanksgiving topics recorded</span><input class="f-i" name="thanksgiving_topics" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="topics">Prayer topics recorded</span><input class="f-i" name="prayer_topics" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="answered">Prayers answered</span><input class="f-i" name="prayers_answered" inputmode="numeric"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i7"><div class="item-n">07</div><div class="item-b">
+      <h2><span class="n-inline">07</span><span data-i18n="h7t">Prayer with others, the house church or the local church</span></h2>
+      <div class="row"><label class="f lg"><span class="f-l" data-i18n="h7l">Frequency, duration and setting</span><input class="f-i" name="prayer_with_others"></label></div>
+    </div></section>
+
+    <section class="block item" id="i8"><div class="item-n">08</div><div class="item-b">
+      <h2><span class="n-inline">08</span><span data-i18n="h8t">Soul winning</span></h2>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="reached">People reached with the gospel</span><input class="f-i" name="people_reached" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="conv">Conversions</span><input class="f-i" name="conversions" inputmode="numeric"></label>
+      </div>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="bapW">Baptised in water</span><input class="f-i" name="baptised_water" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="bapH">Baptised in the Holy Spirit</span><input class="f-i" name="baptised_holy_spirit" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="added">Added to the church</span><input class="f-i" name="added_to_church" inputmode="numeric"></label>
+      </div>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="planted">Churches planted</span><input class="f-i" name="churches_planted" inputmode="numeric"></label>
+        <label class="f"><span class="f-l" data-i18n="perChurch">Members per church</span><input class="f-i" name="members_per_church"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i9"><div class="item-n">09</div><div class="item-b">
+      <h2><span class="n-inline">09</span><span data-i18n="h9t">Fasts</span></h2>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="wed">Wednesday fasts</span><input class="f-i" name="fasts_wednesday" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="complete">Complete fasts of 3 days or more</span><input class="f-i" name="fasts_complete_3days" inputmode="numeric"></label>
+        <label class="f sm"><span class="f-l" data-i18n="encouraged">People you encouraged to fast</span><input class="f-i" name="people_encouraged_to_fast" inputmode="numeric"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i10"><div class="item-n">10</div><div class="item-b">
+      <h2><span class="n-inline">10</span><span data-i18n="h10t">Proclamation of the prophecy</span></h2>
+      <p class="hint" data-i18n="h10h">The entire prophecy of the overthrow of the satanic prince of Cameroon.</p>
+      <div class="row"><label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="prophecy_proclamations" inputmode="numeric"></label></div>
+    </div></section>
+
+    <section class="block item" id="i11"><div class="item-n">11</div><div class="item-b">
+      <h2><span class="n-inline">11</span><span data-i18n="h11t">Finances</span></h2>
+      <div class="section-label" data-i18n="giving">Giving to God</div>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="pct">Percentage (%)</span><input class="f-i" name="giving_percentage" inputmode="decimal"></label>
+        <label class="f sm"><span class="f-l" data-i18n="faithful">Faithfulness</span><select class="f-i yesno" name="giving_faithful"></select></label>
+      </div>
+      <div class="section-label" style="margin-top:1.7rem" data-i18n="savings">Savings</div>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="hasSav">Do you have savings?</span><select class="f-i yesno" name="has_savings"></select></label>
+        <label class="f sm"><span class="f-l" data-i18n="howMuch">How much (FCFA)</span><input class="f-i" name="savings_amount" inputmode="decimal"></label>
+      </div>
+      <div class="section-label" style="margin-top:1.7rem" data-i18n="debts">Debts</div>
+      <div class="row">
+        <label class="f sm"><span class="f-l" data-i18n="indebted">Are you indebted?</span><select class="f-i yesno" name="is_indebted"></select></label>
+        <label class="f sm"><span class="f-l" data-i18n="debtAmt">If yes, how much (FCFA)</span><input class="f-i" name="debt_amount" inputmode="decimal"></label>
+        <label class="f sm"><span class="f-l" data-i18n="reimb">Reimbursed so far (FCFA)</span><input class="f-i" name="debt_reimbursed" inputmode="decimal"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i12"><div class="item-n">12</div><div class="item-b">
+      <h2><span class="n-inline">12</span><span data-i18n="h12t">Bertoua message</span></h2>
+      <div class="row">
+        <label class="f"><span class="f-l" data-i18n="units">Teaching units completed and marked</span><input class="f-i" name="bertoua_units_completed" inputmode="numeric"></label>
+        <label class="f"><span class="f-l" data-i18n="times">Number of times you did them</span><input class="f-i" name="bertoua_times_done" inputmode="numeric"></label>
+      </div>
+    </div></section>
+
+    <section class="block item" id="i13"><div class="item-n">13</div><div class="item-b">
+      <h2><span class="n-inline">13</span><span data-i18n="h13t">Uprooting of idols</span></h2>
+      <div class="row"><label class="f sm"><span class="f-l" data-i18n="idols">Idols uprooted</span><input class="f-i" name="idols_uprooted" inputmode="numeric"></label></div>
+    </div></section>
+
+    <section class="block item" id="i14"><div class="item-n">14</div><div class="item-b">
+      <h2><span class="n-inline">14</span><span data-i18n="h14t">Proclamations</span></h2>
+      <div class="row"><label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="proclamations" inputmode="numeric"></label></div>
+    </div></section>
+
+    <section class="block item" id="i15"><div class="item-n">15</div><div class="item-b">
+      <h2><span class="n-inline">15</span><span data-i18n="h15t">Your involvement in the five year goal</span></h2>
+      <textarea class="f-i" name="five_year_goal" rows="5"></textarea>
+    </div></section>
+
+    <section class="block item" id="i16"><div class="item-n">16</div><div class="item-b">
+      <h2><span class="n-inline">16</span><span data-i18n="h16t">Distinct service to God and to man</span></h2>
+      <textarea class="f-i" name="distinct_service" rows="5"></textarea>
+    </div></section>
+
+    <section class="block item" id="i17"><div class="item-n">17</div><div class="item-b">
+      <h2><span class="n-inline">17</span><span data-i18n="h17t">Making of disciples</span></h2>
+      <textarea class="f-i" name="making_disciples" rows="5"></textarea>
+    </div></section>
+
+  </main>
+</div>
+
+<div class="done" id="done" data-on="false">
+  <h2 data-i18n="doneTitle">Your accounts are recorded</h2>
+  <div class="ticket" id="ticket"></div>
+  <p data-i18n="doneBody">Keep this reference number. Your locality secretary can look the entry up with it.</p>
+  <button type="button" class="btn ghost" id="againBtn" data-i18n="again">Fill another form</button>
+</div>
+
+<footer class="foot" id="foot">
+  <p class="colophon" data-i18n="colophon">School of Knowing and Serving God. Koume, 28 July 2026.</p>
+  <div class="actions">
+    <span class="draft" id="draft" data-on="false" data-i18n="draftSaved">Draft saved</span>
+    <span class="status" id="status" role="status"></span>
+    <button type="button" class="btn ghost" id="printBtn" data-i18n="print">Print</button>
+    <button type="button" class="btn" id="submitBtn" data-i18n="submit">Submit the form</button>
+  </div>
+</footer>
+</div>
+
+<script>
+const I18N = {
+  en:{
+    barSub:"Foundation Camp 2026 / Imitators of ZTF",
+    org:"Christian Missionary Fellowship International",
+    titleA:"Trimestral",titleB:"Accountability",titleC:"Form",
+    ref:"Hebrews 13:7-8",
+    verse:"Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.",
+    begin:"Begin the form",railHead:"Entries",identLabel:"Identification",
+    name:"Name",phone:"Phone",locality:"Locality",province:"Spiritual province or nation",
+    trimester:"Trimester",fromMonth:"From the month of",toMonth:"To the month of",
+    h1:"I gave the accounts of",a1:"My walk with God",a2:"My studies",a3:"My finances",a4:"My service to God",
+    givenTo:"To",every:"Every",fDay:"Day",fWeek:"Week",fMonth:"Month",
+    h2t:"Daily dynamic encounters with God",number:"Number",time:"Time",phTime:"e.g. 45 min",
+    h3t:"Bible reading",chapters:"Chapters read",timeReading:"Time spent reading",
+    h4t:"Bible memorisation",passages:"Passages memorised",
+    h5t:"Reading of Christian literature",h5h:"Title of each book read, the number of pages, and the author.",
+    lTitle:"Title",lPages:"Pages",lAuthor:"Author",addRow:"Add a book",
+    h6t:"Prayer alone",timeAlone:"Time spent praying alone",retreats:"15 minute retreats",
+    thanks:"Thanksgiving topics recorded",topics:"Prayer topics recorded",answered:"Prayers answered",
+    h7t:"Prayer with others, the house church or the local church",h7l:"Frequency, duration and setting",
+    h8t:"Soul winning",reached:"People reached with the gospel",conv:"Conversions",
+    bapW:"Baptised in water",bapH:"Baptised in the Holy Spirit",added:"Added to the church",
+    planted:"Churches planted",perChurch:"Members per church",
+    h9t:"Fasts",wed:"Wednesday fasts",complete:"Complete fasts of 3 days or more",encouraged:"People you encouraged to fast",
+    h10t:"Proclamation of the prophecy",h10h:"The entire prophecy of the overthrow of the satanic prince of Cameroon.",
+    h11t:"Finances",giving:"Giving to God",pct:"Percentage (%)",faithful:"Faithfulness",
+    savings:"Savings",hasSav:"Do you have savings?",howMuch:"How much (FCFA)",
+    debts:"Debts",indebted:"Are you indebted?",debtAmt:"If yes, how much (FCFA)",reimb:"Reimbursed so far (FCFA)",
+    h12t:"Bertoua message",units:"Teaching units completed and marked",times:"Number of times you did them",
+    h13t:"Uprooting of idols",idols:"Idols uprooted",h14t:"Proclamations",
+    h15t:"Your involvement in the five year goal",h16t:"Distinct service to God and to man",h17t:"Making of disciples",
+    colophon:"School of Knowing and Serving God. Koume, 28 July 2026.",
+    print:"Print",submit:"Submit the form",sending:"Sending",draftSaved:"Draft saved",
+    yes:"Yes",no:"No",
+    doneTitle:"Your accounts are recorded",
+    doneBody:"Keep this reference number. Your locality secretary can look the entry up with it.",
+    again:"Fill another form",
+    errName:"Enter your name before submitting.",
+    errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
+    months:["January","February","March","April","May","June","July","August","September","October","November","December"]
+  },
+  fr:{
+    barSub:"Camp de Fondation 2026 / Imitateurs de ZTF",
+    org:"Communion Missionnaire Chrétienne Internationale",
+    titleA:"Fiche de",titleB:"reddition de comptes",titleC:"trimestrielle",
+    ref:"Hébreux 13:7-8",
+    verse:"Souvenez-vous de vos conducteurs qui vous ont annoncé la parole de Dieu ; considérez quelle a été la fin de leur vie, et imitez leur foi. Jésus-Christ est le même hier, aujourd'hui, et éternellement.",
+    begin:"Commencer la fiche",railHead:"Rubriques",identLabel:"Identification",
+    name:"Nom",phone:"Téléphone",locality:"Localité",province:"Province spirituelle ou nation",
+    trimester:"Trimestre",fromMonth:"Du mois de",toMonth:"Au mois de",
+    h1:"J'ai rendu compte de",a1:"Ma marche avec Dieu",a2:"Mes études",a3:"Mes finances",a4:"Mon service pour Dieu",
+    givenTo:"À",every:"Chaque",fDay:"Jour",fWeek:"Semaine",fMonth:"Mois",
+    h2t:"Rencontres dynamiques quotidiennes avec Dieu",number:"Nombre",time:"Temps",phTime:"ex. 45 min",
+    h3t:"Lecture de la Bible",chapters:"Chapitres lus",timeReading:"Temps consacré à la lecture",
+    h4t:"Mémorisation de la Bible",passages:"Passages mémorisés",
+    h5t:"Lecture de la littérature chrétienne",h5h:"Titre de chaque livre lu, le nombre de pages et l'auteur.",
+    lTitle:"Titre",lPages:"Pages",lAuthor:"Auteur",addRow:"Ajouter un livre",
+    h6t:"Prière seul",timeAlone:"Temps passé à prier seul",retreats:"Retraites de 15 minutes",
+    thanks:"Sujets d'action de grâce enregistrés",topics:"Sujets de prière enregistrés",answered:"Prières exaucées",
+    h7t:"Prière avec d'autres, l'église de maison ou l'église locale",h7l:"Fréquence, durée et cadre",
+    h8t:"Gagner des âmes",reached:"Personnes atteintes par l'évangile",conv:"Conversions",
+    bapW:"Baptisées d'eau",bapH:"Baptisées du Saint-Esprit",added:"Ajoutées à l'église",
+    planted:"Églises implantées",perChurch:"Membres par église",
+    h9t:"Jeûnes",wed:"Jeûnes du mercredi",complete:"Jeûnes complets de 3 jours ou plus",encouraged:"Personnes encouragées à jeûner",
+    h10t:"Proclamation de la prophétie",h10h:"Toute la prophétie du renversement du prince satanique du Cameroun.",
+    h11t:"Finances",giving:"Donner à Dieu",pct:"Pourcentage (%)",faithful:"Fidélité",
+    savings:"Épargne",hasSav:"Avez-vous une épargne ?",howMuch:"De combien (FCFA)",
+    debts:"Dettes",indebted:"Êtes-vous endetté ?",debtAmt:"Si oui, de combien (FCFA)",reimb:"Montant déjà remboursé (FCFA)",
+    h12t:"Message de Bertoua",units:"Unités d'enseignement achevées et corrigées",times:"Nombre de fois que vous les avez faites",
+    h13t:"Déracinement des idoles",idols:"Idoles déracinées",h14t:"Proclamations",
+    h15t:"Votre implication dans l'objectif quinquennal",h16t:"Service distinctif à Dieu et à l'homme",h17t:"Formation de disciples",
+    colophon:"École de la Connaissance et du Service de Dieu. Koumé, le 28 juillet 2026.",
+    print:"Imprimer",submit:"Envoyer la fiche",sending:"Envoi en cours",draftSaved:"Brouillon enregistré",
+    yes:"Oui",no:"Non",
+    doneTitle:"Vos comptes sont enregistrés",
+    doneBody:"Conservez ce numéro de référence. Le secrétaire de votre localité peut retrouver la fiche avec ce numéro.",
+    again:"Remplir une autre fiche",
+    errName:"Entrez votre nom avant d'envoyer.",
+    errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
+    months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
+  }
+};
+
+const DRAFT_KEY = 'cmfi-draft-v1';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+let lang = (navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+
+const ROMAN = ['i','ii','iii','iv','v','vi','vii','viii'];
+function litRow(i){
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td>' + (ROMAN[i] || i+1) + '</td>' +
+    '<td><input class="f-i lit-title"></td>' +
+    '<td><input class="f-i lit-pages" inputmode="numeric"></td>' +
+    '<td><input class="f-i lit-author"></td>';
+  return tr;
+}
+function setLitRows(n){
+  const b = $('#litBody');
+  while (b.children.length < n) b.appendChild(litRow(b.children.length));
+}
+setLitRows(4);
+$('#addLit').addEventListener('click', () => {
+  const b = $('#litBody');
+  if (b.children.length < 8) setLitRows(b.children.length + 1);
+});
+
+const rail = $('#rail');
+for (let i = 1; i <= 17; i++){
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'rail-i';
+  b.dataset.target = 'i' + i;
+  b.textContent = String(i).padStart(2,'0');
+  b.setAttribute('aria-label', 'Entry ' + i);
+  b.addEventListener('click', () => $('#i'+i).scrollIntoView({ block:'start' }));
+  rail.appendChild(b);
+}
+function refreshRail(){
+  let done = 0;
+  for (let i = 1; i <= 17; i++){
+    const sec = $('#i'+i);
+    const filled = Array.from(sec.querySelectorAll('input,select,textarea'))
+      .some(el => el.type === 'checkbox' ? el.checked : el.value.trim() !== '');
+    $('.rail-i[data-target="i'+i+'"]').dataset.filled = filled;
+    if (filled) done++;
+  }
+  $('#meter').textContent = done + '/17';
+}
+if ('IntersectionObserver' in window){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const btn = $('.rail-i[data-target="'+e.target.id+'"]');
+      if (btn) btn.dataset.here = e.isIntersecting;
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  for (let i = 1; i <= 17; i++) io.observe($('#i'+i));
+}
+
+function applyLang(l){
+  lang = l;
+  const t = I18N[l];
+  document.documentElement.lang = l;
+  $$('[data-i18n]').forEach(el => { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
+  $$('[data-i18n-ph]').forEach(el => { if (t[el.dataset.i18nPh] !== undefined) el.placeholder = t[el.dataset.i18nPh]; });
+  $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
+  $$('select.month').forEach(s => {
+    const k = s.value;
+    s.innerHTML = '<option value=""></option>' + t.months.map((m,i) => '<option value="'+(i+1)+'">'+m+'</option>').join('');
+    s.value = k;
+  });
+  $$('select.yesno').forEach(s => {
+    const k = s.value;
+    s.innerHTML = '<option value=""></option><option value="yes">'+t.yes+'</option><option value="no">'+t.no+'</option>';
+    s.value = k;
+  });
+  $$('select.freq').forEach(s => {
+    const k = s.value;
+    s.innerHTML = '<option value=""></option><option value="day">'+t.fDay+'</option><option value="week">'+t.fWeek+'</option><option value="month">'+t.fMonth+'</option>';
+    s.value = k;
+  });
+  document.title = l === 'fr'
+    ? 'CMFI Fiche de reddition de comptes trimestrielle'
+    : 'CMFI Trimestral Accountability Form';
+}
+$$('.lang button').forEach(b => b.addEventListener('click', () => { applyLang(b.dataset.lang); saveDraft(); }));
+
+function collect(){
+  const p = { form_language: lang };
+  $$('#sheet [name]').forEach(el => { p[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
+  p.literature = Array.from($('#litBody').children).map(tr => ({
+    title: tr.querySelector('.lit-title').value.trim(),
+    pages: tr.querySelector('.lit-pages').value.trim(),
+    author: tr.querySelector('.lit-author').value.trim()
+  }));
+  return p;
+}
+function restore(p){
+  if (!p) return;
+  if (p.form_language) applyLang(p.form_language);
+  if (Array.isArray(p.literature)) setLitRows(Math.max(4, p.literature.length));
+  $$('#sheet [name]').forEach(el => {
+    if (p[el.name] === undefined) return;
+    if (el.type === 'checkbox') el.checked = !!p[el.name];
+    else el.value = p[el.name];
+  });
+  Array.from($('#litBody').children).forEach((tr,i) => {
+    const r = (p.literature || [])[i];
+    if (!r) return;
+    tr.querySelector('.lit-title').value = r.title || '';
+    tr.querySelector('.lit-pages').value = r.pages || '';
+    tr.querySelector('.lit-author').value = r.author || '';
+  });
+}
+
+let draftTimer;
+function saveDraft(){
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(collect()));
+      const d = $('#draft');
+      d.dataset.on = 'true';
+      setTimeout(() => { d.dataset.on = 'false'; }, 1800);
+    } catch (e) {}
+  }, 700);
+}
+function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+
+function say(msg, tone){ const s = $('#status'); s.textContent = msg; s.dataset.tone = tone || ''; }
+$('#beginBtn').addEventListener('click', () => $('#ident').scrollIntoView({ block:'start' }));
+$('#printBtn').addEventListener('click', () => window.print());
+$('#againBtn').addEventListener('click', () => { clearDraft(); location.reload(); });
+
+$('#submitBtn').addEventListener('click', async () => {
+  const t = I18N[lang];
+  const nameField = $('[name="full_name"]');
+  if (!nameField.value.trim()){
+    say(t.errName, 'bad');
+    nameField.scrollIntoView({ block:'center' });
+    nameField.focus();
+    return;
+  }
+  const btn = $('#submitBtn');
+  btn.disabled = true;
+  say(t.sending, '');
+  try {
+    const res = await fetch('/api/returns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect())
+    });
+    if (!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
+    clearDraft();
+    say('', '');
+    $('#formArea').hidden = true;
+    $('#foot').hidden = true;
+    $('#ticket').textContent = 'No. ' + data.id;
+    $('#done').dataset.on = 'true';
+    window.scrollTo({ top: 0 });
+  } catch (e) {
+    say(t.errNet, 'bad');
+    btn.disabled = false;
+  }
+});
+
+document.addEventListener('input', () => { refreshRail(); saveDraft(); });
+document.addEventListener('change', () => { refreshRail(); saveDraft(); });
+
+applyLang(lang);
+try {
+  const saved = localStorage.getItem(DRAFT_KEY);
+  if (saved) { restore(JSON.parse(saved)); refreshRail(); }
+} catch (e) {}
+refreshRail();
+</script>
+</body>
+</html>

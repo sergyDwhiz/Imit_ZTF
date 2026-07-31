@@ -1,0 +1,16 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  # schema.sql is read at runtime by migrate.mjs, so it must be bundled
+  # alongside the function. esbuild only ships JS unless told otherwise.
+  included_files = ["netlify/functions/schema.sql"]
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
