@@ -43,12 +43,6 @@ body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--body);
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .lang button+button{border-left:1px solid var(--ink)}
 
-.entry-toggle{display:flex;border:1px solid var(--seal);margin-bottom:.8rem;width:fit-content}
-.et-btn{font-family:var(--mono);font-size:.8rem;font-weight:700;letter-spacing:.06em;
-  padding:.65rem 1.3rem;background:none;border:0;cursor:pointer;color:var(--seal)}
-.et-btn[aria-pressed="true"]{background:var(--seal);color:var(--paper)}
-.et-btn+.et-btn{border-left:1px solid var(--seal)}
-
 .hero{padding:5rem 0 3.5rem}
 @media(min-width:820px){.hero{padding:7rem 0 4.5rem}}
 .eyebrow{margin:0 0 .8rem;font-family:var(--mono);font-size:.72rem;
@@ -240,11 +234,6 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 
     <section class="block" id="ident">
       <div class="block-body">
-        <div class="entry-toggle" role="group" aria-label="Entry type">
-          <button type="button" class="et-btn" data-type="goal" aria-pressed="false" data-i18n="entryGoal">This is a goal</button>
-          <button type="button" class="et-btn" data-type="result" aria-pressed="true" data-i18n="entryResult">This is a result</button>
-        </div>
-        <p class="hint" data-i18n="entryHint">A goal is what you're aiming for this trimester. A result is what actually happened, reported afterwards.</p>
         <div class="section-label" data-i18n="identLabel">Identification</div>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
@@ -497,8 +486,6 @@ const I18N = {
     ref:"Hebrews 13:7-8",
     verse:"Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.",
     begin:"Begin the form",railHead:"Entries",identLabel:"Identification",
-    entryGoal:"This is a goal",entryResult:"This is a result",
-    entryHint:"A goal is what you're aiming for this trimester. A result is what actually happened, reported afterwards.",
     phoneHint:"Your phone number links this report to your next one. Please use the same number every time.",
     confirmPrompt:"We found other reports using this phone number. Which of these is you?",
     confirmNone:"None of these — this is my first report",
@@ -548,8 +535,6 @@ const I18N = {
     ref:"Hébreux 13:7-8",
     verse:"Souvenez-vous de vos conducteurs qui vous ont annoncé la parole de Dieu ; considérez quelle a été la fin de leur vie, et imitez leur foi. Jésus-Christ est le même hier, aujourd'hui, et éternellement.",
     begin:"Commencer la fiche",railHead:"Rubriques",identLabel:"Identification",
-    entryGoal:"Ceci est un objectif",entryResult:"Ceci est un résultat",
-    entryHint:"Un objectif est ce que vous visez pour ce trimestre. Un résultat est ce qui s'est réellement passé, rapporté après coup.",
     phoneHint:"Votre numéro de téléphone relie cette fiche à la prochaine. Utilisez le même numéro à chaque fois.",
     confirmPrompt:"Nous avons trouvé d'autres fiches utilisant ce numéro de téléphone. Laquelle est la vôtre ?",
     confirmNone:"Aucune de celles-ci — c'est ma première fiche",
@@ -599,17 +584,23 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 let lang = (navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en';
 
-// Kept separate from the per-answer draft (which clears after every submit)
-// so someone entering many goals in a row doesn't have to re-toggle it
-// each time — it only changes when they deliberately switch it.
+// entry_type is never shown or chosen on the form — it's an internal
+// distinction for us, not something a submitter should have to think about.
+// Staff doing the paper-to-digital goal transcription open the form with
+// ?entry=goal on the link; everyone else gets the default 'result' with
+// nothing on screen either way. Sticky per device (separate from the
+// per-answer draft, which clears after every submit) so staff don't need
+// the query string on every reload during a long bulk-entry session.
 const ENTRY_TYPE_KEY = 'cmfi-entrytype-v1';
-let entryType = localStorage.getItem(ENTRY_TYPE_KEY) === 'goal' ? 'goal' : 'result';
+const urlEntryType = new URLSearchParams(location.search).get('entry');
+let entryType = urlEntryType === 'goal' || urlEntryType === 'result'
+  ? urlEntryType
+  : (localStorage.getItem(ENTRY_TYPE_KEY) === 'goal' ? 'goal' : 'result');
 function applyEntryType(t){
   entryType = t === 'goal' ? 'goal' : 'result';
-  $$('.et-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === entryType)));
   try { localStorage.setItem(ENTRY_TYPE_KEY, entryType); } catch (e) {}
 }
-$$('.et-btn').forEach(b => b.addEventListener('click', () => { applyEntryType(b.dataset.type); saveDraft(); }));
+applyEntryType(entryType);
 
 const ROMAN = ['i','ii','iii','iv','v','vi','vii','viii'];
 function litRow(i){
@@ -865,7 +856,6 @@ document.addEventListener('input', () => { refreshRail(); saveDraft(); });
 document.addEventListener('change', () => { refreshRail(); saveDraft(); });
 
 applyLang(lang);
-applyEntryType(entryType);
 try {
   const saved = localStorage.getItem(DRAFT_KEY);
   if (saved) { restore(JSON.parse(saved)); refreshRail(); }

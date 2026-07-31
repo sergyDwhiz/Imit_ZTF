@@ -24,19 +24,30 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
     submitted_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
     form_language               TEXT NOT NULL DEFAULT 'en' CHECK (form_language IN ('en', 'fr')),
 
+    -- A trimester has two distinct entries: the goal set beforehand and
+    -- the actual result reported afterwards. They are a pair, not
+    -- duplicates of each other. Never shown or chosen on the form itself —
+    -- an internal distinction, set only via a hidden URL flag staff use.
+    entry_type                  TEXT NOT NULL DEFAULT 'result' CHECK (entry_type IN ('goal', 'result')),
+
     -- Identification
     full_name                   TEXT NOT NULL,
-    phone                       TEXT,
+    phone                       TEXT NOT NULL,
+    trimester_number            SMALLINT CHECK (trimester_number BETWEEN 1 AND 4),
     locality                    TEXT,
     spiritual_province          TEXT,
-    trimester_number            SMALLINT CHECK (trimester_number BETWEEN 1 AND 4),
     month_from                  SMALLINT CHECK (month_from BETWEEN 1 AND 12),
     month_to                    SMALLINT CHECK (month_to BETWEEN 1 AND 12),
+
+    -- Links each return to a person (see people table above) so their
+    -- trimestral reports stack up into one history instead of
+    -- disconnected rows. Resolved by phone number at submit time.
+    person_id                   BIGINT REFERENCES people(id),
 
     -- 1. Accounts given
     acct_walk_with_god          BOOLEAN NOT NULL DEFAULT FALSE,
     acct_studies                BOOLEAN NOT NULL DEFAULT FALSE,
-    acct_finances               BOOLEAN NOT NULL DEFAULT FALSE,
+    acct_finances                BOOLEAN NOT NULL DEFAULT FALSE,
     acct_service_to_god         BOOLEAN NOT NULL DEFAULT FALSE,
     acct_given_to               TEXT,
     acct_frequency              TEXT CHECK (acct_frequency IN ('day', 'week', 'month')),
@@ -107,19 +118,12 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
     making_disciples            TEXT
 );
 
--- Added after the initial release: links each return to a person so their
--- trimestral reports stack up into one history instead of disconnected rows.
+-- Idempotent safety net for any environment where these were added after
+-- the initial release via ALTER TABLE, rather than being present in the
+-- CREATE TABLE above from the start (a fresh database already has them).
 ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS person_id BIGINT REFERENCES people(id);
-
--- Phone is how a later submission finds its way back to this person, so it
--- can no longer be optional. Safe to run even if rows already satisfy it.
 ALTER TABLE people ALTER COLUMN phone SET NOT NULL;
 ALTER TABLE accountability_returns ALTER COLUMN phone SET NOT NULL;
-
--- A trimester has two distinct entries: the goal set beforehand and the
--- actual result reported afterwards. They are a pair, not duplicates of
--- each other — the "already submitted this trimester" check compares
--- (person, trimester, entry_type), not just (person, trimester).
 ALTER TABLE accountability_returns
     ADD COLUMN IF NOT EXISTS entry_type TEXT NOT NULL DEFAULT 'result'
     CHECK (entry_type IN ('goal', 'result'));
@@ -150,9 +154,9 @@ SELECT
     r.entry_type,
     r.full_name,
     r.phone,
+    r.trimester_number,
     r.locality,
     r.spiritual_province,
-    r.trimester_number,
     r.ddeg_number,
     r.bible_chapters,
     r.people_reached,
