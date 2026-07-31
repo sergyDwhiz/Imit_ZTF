@@ -564,7 +564,7 @@ const I18N = {
     debts:"Dettes",indebted:"Êtes-vous endetté ?",debtAmt:"Si oui, de combien (FCFA)",reimb:"Montant déjà remboursé (FCFA)",
     h12t:"Message de Bertoua",units:"Unités d'enseignement achevées et corrigées",times:"Nombre de fois que vous les avez faites",
     h13t:"Déracinement des idoles",idols:"Idoles déracinées",h14t:"Proclamations",
-    h15t:"Votre implication dans l'objectif quinquennal",h16t:"Service distinctif à Dieu et à l'homme",h17t:"Formation de disciples",
+    h15t:"Votre implication dans l'objectif quinquennal",h16t:"Service distinct à Dieu et à l'homme",h17t:"Formation de disciples",
     colophon:"École de la Connaissance et du Service de Dieu. Koumé, le 28 juillet 2026.",
     print:"Imprimer",submit:"Envoyer la fiche",sending:"Envoi en cours",draftSaved:"Brouillon enregistré",
     yes:"Oui",no:"Non",
@@ -661,7 +661,7 @@ function applyLang(l){
     s.value = k;
   });
   document.title = l === 'fr'
-    ? 'Fiche de reddition de comptes des Imitateurs de ZTF'
+    ? 'Fiche de compte rendu trimestrielle imitateurs de ZTF'
     : 'Imitators of ZTF Accountability Form';
 }
 $$('.lang button').forEach(b => b.addEventListener('click', () => { applyLang(b.dataset.lang); saveDraft(); }));
