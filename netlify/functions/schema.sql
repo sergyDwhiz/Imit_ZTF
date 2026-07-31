@@ -22,7 +22,6 @@ ALTER TABLE people DROP COLUMN IF EXISTS member_code;
 CREATE TABLE IF NOT EXISTS accountability_returns (
     id                          BIGSERIAL PRIMARY KEY,
     submitted_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
-    form_language               TEXT NOT NULL DEFAULT 'en' CHECK (form_language IN ('en', 'fr')),
 
     -- A trimester has two distinct entries: the goal set beforehand and
     -- the actual result reported afterwards. They are a pair, not
@@ -127,6 +126,10 @@ ALTER TABLE accountability_returns ALTER COLUMN phone SET NOT NULL;
 ALTER TABLE accountability_returns
     ADD COLUMN IF NOT EXISTS entry_type TEXT NOT NULL DEFAULT 'result'
     CHECK (entry_type IN ('goal', 'result'));
+
+-- Not useful data for tracking anyone's progress — dropped, the EN/FR
+-- toggle on the form itself is untouched, this only stops recording it.
+ALTER TABLE accountability_returns DROP COLUMN IF EXISTS form_language;
 
 CREATE INDEX IF NOT EXISTS idx_returns_name
     ON accountability_returns (lower(full_name));

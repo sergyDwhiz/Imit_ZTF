@@ -696,7 +696,7 @@ $('[name="phone_local"]').addEventListener('blur', function(){
 });
 
 function collect(){
-  const p = { form_language: lang, entry_type: entryType };
+  const p = { entry_type: entryType };
   $$('#sheet [name]').forEach(el => { p[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
   p.literature = Array.from($('#litBody').children).map(tr => ({
     title: tr.querySelector('.lit-title').value.trim(),
@@ -711,7 +711,6 @@ function collect(){
 }
 function restore(p){
   if (!p) return;
-  if (p.form_language) applyLang(p.form_language);
   if (p.entry_type) applyEntryType(p.entry_type);
   if (Array.isArray(p.literature)) setLitRows(Math.max(4, p.literature.length));
   $$('#sheet [name]').forEach(el => {
