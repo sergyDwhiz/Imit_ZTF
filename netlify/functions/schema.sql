@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS people (
 );
 
 -- Cleans up the member-code approach from an earlier revision, superseded
--- by phone-based matching above.
+-- by phone-based matching above. The old accountability_summary view read
+-- this column, so it must be dropped first (recreated further down).
+DROP VIEW IF EXISTS accountability_summary;
 ALTER TABLE people DROP COLUMN IF EXISTS member_code;
 
 CREATE TABLE IF NOT EXISTS accountability_returns (
