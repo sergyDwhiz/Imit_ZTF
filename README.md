@@ -9,6 +9,7 @@ public/index.html            the whole site, one file
 netlify/functions/
   returns.mjs                POST + GET /api/returns
   migrate.mjs                GET /api/migrate?token=...
+  export.mjs                 GET /api/export?token=... (full CSV download)
   health.mjs                 GET /api/health
   _db.mjs                    connection, column list, type coercion
   schema.sql                 table, indexes, summary view (single source of truth)
@@ -62,12 +63,13 @@ Against a local PostgreSQL without SSL, add `PGSSL=false` to `.env`.
 
 ## Endpoints
 
-| Method | Path           | Purpose                            |
-|--------|----------------|------------------------------------|
-| POST   | `/api/returns` | Save a completed form              |
-| GET    | `/api/returns` | Summary list, newest first         |
-| GET    | `/api/health`  | Database reachability              |
-| GET    | `/api/migrate` | Create the schema, token required  |
+| Method | Path           | Purpose                              |
+|--------|----------------|---------------------------------------|
+| POST   | `/api/returns` | Save a completed form                |
+| GET    | `/api/returns` | Summary list, newest first           |
+| GET    | `/api/health`  | Database reachability                |
+| GET    | `/api/migrate` | Create the schema, token required    |
+| GET    | `/api/export`  | Full CSV of every field, token required |
 
 ## Notes
 
@@ -79,11 +81,19 @@ Every label lives in the `I18N` object near the bottom of `public/index.html`.
 Adding a third language means adding one key there and one button in the top
 bar. The language used is stored on each row in `form_language`.
 
-Export for the province secretary:
+## Handing the full data to someone
 
-```sql
-\copy (SELECT * FROM accountability_summary ORDER BY submitted_at) TO 'returns.csv' CSV HEADER;
+Open this URL in any browser — no database tools, no command line:
+
+```
+https://YOUR-SITE.netlify.app/api/export?token=YOUR_MIGRATE_TOKEN
 ```
 
-`GET /api/returns` is open. If the returns should not be public, put Netlify
-Identity or a shared token in front of it before you share the URL.
+It downloads a CSV with every field from every submission (not the trimmed
+summary), ready to open in Excel, Google Sheets, or hand off as-is. Same
+token as `/api/migrate` gates it, so don't share that token beyond whoever
+is allowed to pull the full dataset.
+
+`GET /api/returns` is open to anyone with the URL and only exposes the
+trimmed summary view. If even that shouldn't be public, put Netlify Identity
+or a shared token in front of it before you share the URL.
