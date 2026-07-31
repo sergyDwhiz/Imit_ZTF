@@ -1,10 +1,13 @@
 import sql, { buildRow, json, normPhone, normName } from './_db.mjs';
 
+// people.phone always stores the normalised digits, never what was typed —
+// that's what makes the exact-match lookup below reliable regardless of
+// whether a submission included a country code or not.
 async function createPerson(body) {
   const [person] = await sql`
     INSERT INTO people (full_name, phone)
-    VALUES (${String(body.full_name).trim()}, ${body.phone ? String(body.phone).trim() : null})
-    RETURNING id, full_name
+    VALUES (${String(body.full_name).trim()}, ${normPhone(body.phone)})
+    RETURNING id, full_name, phone
   `;
   return person;
 }
@@ -15,21 +18,19 @@ async function createPerson(body) {
 // resolved person — the client must ask the submitter which one is them
 // and resubmit with either `person_id` or `new_person: true` set.
 async function resolvePerson(body) {
+  const phone = normPhone(body.phone);
+
   if (body.person_id) {
     const [person] = await sql`SELECT id, full_name, phone FROM people WHERE id = ${body.person_id}`;
-    if (!person || normPhone(person.phone) !== normPhone(body.phone)) return null;
+    if (!person || person.phone !== phone) return null;
     return { person, isNew: false };
   }
 
-  const phone = normPhone(body.phone);
-  if (!phone || body.new_person) {
+  if (body.new_person) {
     return { person: await createPerson(body), isNew: true };
   }
 
-  const matches = await sql`
-    SELECT id, full_name, phone FROM people
-    WHERE regexp_replace(phone, '\\D', '', 'g') = ${phone}
-  `;
+  const matches = await sql`SELECT id, full_name, phone FROM people WHERE phone = ${phone}`;
   if (matches.length === 0) {
     return { person: await createPerson(body), isNew: true };
   }
