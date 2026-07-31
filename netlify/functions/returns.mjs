@@ -54,6 +54,11 @@ export default async (req) => {
     if (!body?.full_name || !String(body.full_name).trim()) {
       return json({ error: 'missing_name' }, 400);
     }
+    // Required: it's the only thing that links this submission to the
+    // person's next one. Without it every submission becomes an orphan.
+    if (!body?.phone || !String(body.phone).trim()) {
+      return json({ error: 'missing_phone' }, 400);
+    }
 
     let resolved;
     try {

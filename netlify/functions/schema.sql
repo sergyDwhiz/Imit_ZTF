@@ -9,7 +9,7 @@
 CREATE TABLE IF NOT EXISTS people (
     id                          BIGSERIAL PRIMARY KEY,
     full_name                   TEXT NOT NULL,
-    phone                       TEXT,
+    phone                       TEXT NOT NULL,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -110,6 +110,11 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
 -- Added after the initial release: links each return to a person so their
 -- trimestral reports stack up into one history instead of disconnected rows.
 ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS person_id BIGINT REFERENCES people(id);
+
+-- Phone is how a later submission finds its way back to this person, so it
+-- can no longer be optional. Safe to run even if rows already satisfy it.
+ALTER TABLE people ALTER COLUMN phone SET NOT NULL;
+ALTER TABLE accountability_returns ALTER COLUMN phone SET NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_returns_name
     ON accountability_returns (lower(full_name));

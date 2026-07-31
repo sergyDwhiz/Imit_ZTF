@@ -469,6 +469,7 @@ const I18N = {
     doneBody:"Keep this reference number. Your locality secretary can look the entry up with it.",
     again:"Fill another form",
     errName:"Enter your name before submitting.",
+    errPhone:"Enter your phone number before submitting — it's what links this report to your next one.",
     errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
     months:["January","February","March","April","May","June","July","August","September","October","November","December"]
   },
@@ -517,6 +518,7 @@ const I18N = {
     doneBody:"Conservez ce numéro de référence. Le secrétaire de votre localité peut retrouver la fiche avec ce numéro.",
     again:"Remplir une autre fiche",
     errName:"Entrez votre nom avant d'envoyer.",
+    errPhone:"Entrez votre numéro de téléphone avant d'envoyer — c'est ce qui relie cette fiche à la prochaine.",
     errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
     months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
   }
@@ -746,6 +748,13 @@ $('#submitBtn').addEventListener('click', () => {
     say(t.errName, 'bad');
     nameField.scrollIntoView({ block:'center' });
     nameField.focus();
+    return;
+  }
+  const phoneField = $('[name="phone"]');
+  if (!phoneField.value.trim()){
+    say(t.errPhone, 'bad');
+    phoneField.scrollIntoView({ block:'center' });
+    phoneField.focus();
     return;
   }
   submitReturn({});
