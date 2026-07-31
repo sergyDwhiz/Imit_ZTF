@@ -97,18 +97,14 @@ export function buildRow(body) {
 }
 
 // Digits only, so "+237 600 000 001" and "237-600-000-001" match as the same
-// phone. Local mobile numbers here are commonly typed without the country
-// code at all ("677123456"), so a bare 9-digit number is assumed to be a
-// local number and gets the default code added — otherwise "677123456" and
-// "+237677123456" would be treated as two different people. Override
-// DEFAULT_COUNTRY_CODE in the environment for a different default.
-const DEFAULT_COUNTRY_CODE = process.env.DEFAULT_COUNTRY_CODE || '237';
-
+// phone. The form always sends an explicit country code (the submitter
+// picks it from a dropdown), so this only needs to normalise formatting —
+// it must not guess a country code for a bare local number, since the same
+// local-number length means something different in every country and this
+// form is used by submitters from many countries.
 export function normPhone(raw) {
   let digits = String(raw ?? '').replace(/\D/g, '');
-  if (digits.startsWith('00')) digits = digits.slice(2);                        // "00237..." dialing prefix
-  if (digits.length === 10 && digits.startsWith('0')) digits = digits.slice(1); // stray trunk 0
-  if (digits.length === 9) digits = DEFAULT_COUNTRY_CODE + digits;              // no country code at all
+  if (digits.startsWith('00')) digits = digits.slice(2); // "00237..." dialing prefix
   return digits;
 }
 

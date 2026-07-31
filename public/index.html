@@ -120,6 +120,7 @@ select.f-i{appearance:none;cursor:pointer;padding-right:1.2rem;
   background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
   background-position:calc(100% - 9px) 55%,calc(100% - 4px) 55%;
   background-size:5px 5px;background-repeat:no-repeat}
+select.cc{max-width:11rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 textarea.f-i{font-family:var(--body);font-size:.95rem;line-height:2rem;min-height:8.5rem;
   resize:vertical;border:1px solid var(--rule);padding:.35rem .7rem;
   background-image:repeating-linear-gradient(transparent,transparent 1.94rem,var(--rule) 1.94rem,var(--rule) 2rem);
@@ -238,7 +239,8 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
         <div class="section-label" data-i18n="identLabel">Identification</div>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
-          <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone" type="tel" autocomplete="tel"></label>
+          <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone_cc"></select></label>
+          <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone_local" type="tel" inputmode="tel" autocomplete="tel"></label>
         </div>
         <p class="hint" data-i18n="phoneHint">Your phone number links this report to your next one. Please use the same number every time.</p>
         <div class="row">
@@ -423,6 +425,37 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 </div>
 
 <script>
+// Country calling codes. Explicit and picked by the submitter — guessing a
+// default from a bare local number isn't safe once submitters come from
+// more than one country, since a 9-digit local number means something
+// different in every country. Cameroon is pre-selected since most
+// submitters are expected to be there, but it's always visible and
+// changeable, never silently assumed.
+const COUNTRY_CODES = [
+  ["237","Cameroon"],["234","Nigeria"],["233","Ghana"],["221","Senegal"],["225","Côte d'Ivoire"],
+  ["229","Benin"],["228","Togo"],["226","Burkina Faso"],["223","Mali"],["227","Niger"],
+  ["220","Gambia"],["224","Guinea"],["245","Guinea-Bissau"],["238","Cabo Verde"],["222","Mauritania"],
+  ["231","Liberia"],["232","Sierra Leone"],["236","Central African Republic"],["235","Chad"],
+  ["241","Gabon"],["242","Congo (Brazzaville)"],["243","Congo (DRC)"],["240","Equatorial Guinea"],
+  ["239","São Tomé and Príncipe"],["244","Angola"],["258","Mozambique"],["260","Zambia"],
+  ["263","Zimbabwe"],["267","Botswana"],["264","Namibia"],["266","Lesotho"],["268","Eswatini"],
+  ["27","South Africa"],["230","Mauritius"],["248","Seychelles"],["261","Madagascar"],
+  ["254","Kenya"],["255","Tanzania"],["256","Uganda"],["250","Rwanda"],["257","Burundi"],
+  ["251","Ethiopia"],["252","Somalia"],["253","Djibouti"],["291","Eritrea"],["211","South Sudan"],
+  ["249","Sudan"],["20","Egypt"],["218","Libya"],["216","Tunisia"],["213","Algeria"],["212","Morocco"],
+  ["1","United States / Canada"],["44","United Kingdom"],["33","France"],["49","Germany"],
+  ["32","Belgium"],["31","Netherlands"],["41","Switzerland"],["39","Italy"],["34","Spain"],
+  ["351","Portugal"],["353","Ireland"],["46","Sweden"],["47","Norway"],["45","Denmark"],
+  ["358","Finland"],["48","Poland"],["30","Greece"],["90","Türkiye"],["7","Russia / Kazakhstan"],
+  ["380","Ukraine"],["91","India"],["92","Pakistan"],["880","Bangladesh"],["94","Sri Lanka"],
+  ["977","Nepal"],["86","China"],["81","Japan"],["82","South Korea"],["852","Hong Kong"],
+  ["65","Singapore"],["60","Malaysia"],["66","Thailand"],["84","Vietnam"],["62","Indonesia"],
+  ["63","Philippines"],["971","United Arab Emirates"],["966","Saudi Arabia"],["974","Qatar"],
+  ["965","Kuwait"],["962","Jordan"],["961","Lebanon"],["972","Israel"],["964","Iraq"],["98","Iran"],
+  ["61","Australia"],["64","New Zealand"],["55","Brazil"],["54","Argentina"],["56","Chile"],
+  ["57","Colombia"],["52","Mexico"],["51","Peru"],["58","Venezuela"],["593","Ecuador"]
+];
+
 const I18N = {
   en:{
     barSub:"Foundation Camp 2026",
@@ -439,7 +472,7 @@ const I18N = {
     duplicatePrompt:"You already have a submission for Trimester {n}, from {date}. Submit this one anyway?",
     duplicateSubmit:"Submit anyway",
     duplicateCancel:"Cancel, let me check",
-    name:"Name",phone:"Phone",locality:"Locality",province:"Spiritual province or nation",
+    name:"Name",phone:"Phone",phoneCode:"Country code",locality:"Locality",province:"Spiritual province or nation",
     trimester:"Trimester",fromMonth:"From the month of",toMonth:"To the month of",
     h1:"I gave the accounts of",a1:"My walk with God",a2:"My studies",a3:"My finances",a4:"My service to God",
     givenTo:"To",every:"Every",fDay:"Day",fWeek:"Week",fMonth:"Month",
@@ -488,7 +521,7 @@ const I18N = {
     duplicatePrompt:"Vous avez déjà une fiche pour le trimestre {n}, datée du {date}. Envoyer quand même ?",
     duplicateSubmit:"Envoyer quand même",
     duplicateCancel:"Annuler, je vais vérifier",
-    name:"Nom",phone:"Téléphone",locality:"Localité",province:"Province spirituelle ou nation",
+    name:"Nom",phone:"Téléphone",phoneCode:"Indicatif du pays",locality:"Localité",province:"Province spirituelle ou nation",
     trimester:"Trimestre",fromMonth:"Du mois de",toMonth:"Au mois de",
     h1:"J'ai rendu compte de",a1:"Ma marche avec Dieu",a2:"Mes études",a3:"Mes finances",a4:"Mon service pour Dieu",
     givenTo:"À",every:"Chaque",fDay:"Jour",fWeek:"Semaine",fMonth:"Mois",
@@ -587,6 +620,11 @@ function applyLang(l){
   $$('[data-i18n]').forEach(el => { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
   $$('[data-i18n-ph]').forEach(el => { if (t[el.dataset.i18nPh] !== undefined) el.placeholder = t[el.dataset.i18nPh]; });
   $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
+  $$('select.cc').forEach(s => {
+    const k = s.value;
+    s.innerHTML = COUNTRY_CODES.map(c => '<option value="'+c[0]+'">+'+c[0]+' '+c[1]+'</option>').join('');
+    s.value = k || '237';
+  });
   $$('select.month').forEach(s => {
     const k = s.value;
     s.innerHTML = '<option value=""></option>' + t.months.map((m,i) => '<option value="'+(i+1)+'">'+m+'</option>').join('');
@@ -616,6 +654,8 @@ function collect(){
     pages: tr.querySelector('.lit-pages').value.trim(),
     author: tr.querySelector('.lit-author').value.trim()
   }));
+  const localDigits = (p.phone_local || '').replace(/\D/g, '');
+  p.phone = localDigits ? ('+' + p.phone_cc + localDigits) : '';
   return p;
 }
 function restore(p){
@@ -750,7 +790,7 @@ $('#submitBtn').addEventListener('click', () => {
     nameField.focus();
     return;
   }
-  const phoneField = $('[name="phone"]');
+  const phoneField = $('[name="phone_local"]');
   if (!phoneField.value.trim()){
     say(t.errPhone, 'bad');
     phoneField.scrollIntoView({ block:'center' });
