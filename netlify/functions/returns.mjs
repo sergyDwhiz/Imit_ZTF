@@ -1,29 +1,45 @@
-import sql, { buildRow, json, genMemberCode } from './_db.mjs';
+import sql, { buildRow, json, normPhone, normName } from './_db.mjs';
 
-// A returning person must supply the member_code they were given on their
-// first submission — that is the only thing that links a new return to an
-// existing person. No code means a brand new person record is created.
+async function createPerson(body) {
+  const [person] = await sql`
+    INSERT INTO people (full_name, phone)
+    VALUES (${String(body.full_name).trim()}, ${body.phone ? String(body.phone).trim() : null})
+    RETURNING id, full_name
+  `;
+  return person;
+}
+
+// Matches a submission to a person by phone number. A phone with no prior
+// name match (new sibling on a shared phone, or the same person's name
+// drifted since last time) comes back as `candidates` instead of a
+// resolved person — the client must ask the submitter which one is them
+// and resubmit with either `person_id` or `new_person: true` set.
 async function resolvePerson(body) {
-  const rawCode = body.member_code ? String(body.member_code).trim().toUpperCase() : '';
-
-  if (rawCode) {
-    const [person] = await sql`SELECT id, member_code FROM people WHERE member_code = ${rawCode}`;
-    return person ? { person, isNew: false } : null;
+  if (body.person_id) {
+    const [person] = await sql`SELECT id, full_name, phone FROM people WHERE id = ${body.person_id}`;
+    if (!person || normPhone(person.phone) !== normPhone(body.phone)) return null;
+    return { person, isNew: false };
   }
 
-  for (let attempt = 0; attempt < 5; attempt++) {
-    try {
-      const [person] = await sql`
-        INSERT INTO people (member_code, full_name, phone)
-        VALUES (${genMemberCode()}, ${String(body.full_name).trim()}, ${body.phone ? String(body.phone).trim() : null})
-        RETURNING id, member_code
-      `;
-      return { person, isNew: true };
-    } catch (err) {
-      if (err.code !== '23505') throw err; // unique_violation on member_code, retry with a new one
-    }
+  const phone = normPhone(body.phone);
+  if (!phone || body.new_person) {
+    return { person: await createPerson(body), isNew: true };
   }
-  throw new Error('could not generate a unique member code');
+
+  const matches = await sql`
+    SELECT id, full_name, phone FROM people
+    WHERE regexp_replace(phone, '\\D', '', 'g') = ${phone}
+  `;
+  if (matches.length === 0) {
+    return { person: await createPerson(body), isNew: true };
+  }
+
+  const exact = matches.filter(m => normName(m.full_name) === normName(body.full_name));
+  if (exact.length === 1) {
+    return { person: exact[0], isNew: false };
+  }
+
+  return { candidates: matches.map(m => ({ id: m.id, full_name: m.full_name })) };
 }
 
 export default async (req) => {
@@ -47,7 +63,10 @@ export default async (req) => {
       return json({ error: 'person_resolution_failed' }, 500);
     }
     if (!resolved) {
-      return json({ error: 'member_code_not_found' }, 404);
+      return json({ error: 'person_mismatch' }, 400);
+    }
+    if (resolved.candidates) {
+      return json({ error: 'confirm_person', candidates: resolved.candidates }, 409);
     }
 
     const row = buildRow(body);
@@ -58,7 +77,7 @@ export default async (req) => {
         INSERT INTO accountability_returns ${sql(row)}
         RETURNING id, submitted_at
       `;
-      return json({ ...saved, member_code: resolved.person.member_code, is_new_member: resolved.isNew }, 201);
+      return json({ ...saved, person_id: resolved.person.id, is_new_person: resolved.isNew }, 201);
     } catch (err) {
       console.error('Insert failed:', err.message);
       return json({ error: 'insert_failed' }, 500);

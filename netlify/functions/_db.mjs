@@ -1,5 +1,4 @@
 import postgres from 'postgres';
-import { randomInt } from 'node:crypto';
 
 // One connection per Lambda container. Managed Postgres providers hand out a
 // pooled connection string; keeping max at 1 stops cold starts from exhausting it.
@@ -97,14 +96,12 @@ export function buildRow(body) {
   return row;
 }
 
-// Excludes 0/O/1/I/L so a handwritten or read-aloud code isn't ambiguous.
-const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+// Digits only, so "+237 600 000 001" and "237-600-000-001" match as the same phone.
+export const normPhone = raw => String(raw ?? '').replace(/\D/g, '');
 
-export function genMemberCode(length = 6) {
-  let code = '';
-  for (let i = 0; i < length; i++) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
-  return code;
-}
+// Case/whitespace-insensitive, so retyping a name slightly differently
+// between trimesters still counts as the same name.
+export const normName = raw => String(raw ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 
 export const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {

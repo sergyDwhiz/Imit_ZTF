@@ -2,16 +2,20 @@
 -- Foundation Camp 2026 - Trimestral Accountability Form
 -- PostgreSQL schema
 
--- One row per person. member_code is handed to them on their first
--- submission and is the only way a later submission links back to this
--- record (no login system, so no other identity check is done).
+-- One row per person. A later submission is matched back to an existing
+-- row by phone number (normalised to digits only); if that phone has more
+-- than one name on record (e.g. siblings sharing a household phone), the
+-- submitter is asked to pick which one is them rather than guessing.
 CREATE TABLE IF NOT EXISTS people (
     id                          BIGSERIAL PRIMARY KEY,
-    member_code                 TEXT NOT NULL UNIQUE,
     full_name                   TEXT NOT NULL,
     phone                       TEXT,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Cleans up the member-code approach from an earlier revision, superseded
+-- by phone-based matching above.
+ALTER TABLE people DROP COLUMN IF EXISTS member_code;
 
 CREATE TABLE IF NOT EXISTS accountability_returns (
     id                          BIGSERIAL PRIMARY KEY,
@@ -113,6 +117,8 @@ CREATE INDEX IF NOT EXISTS idx_returns_province
     ON accountability_returns (spiritual_province);
 CREATE INDEX IF NOT EXISTS idx_returns_person
     ON accountability_returns (person_id, submitted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_people_phone
+    ON people (phone);
 
 -- Convenience view for the province secretaries.
 -- Dropped and recreated (rather than CREATE OR REPLACE) because the column
@@ -124,7 +130,6 @@ SELECT
     r.id,
     r.submitted_at,
     r.person_id,
-    pe.member_code,
     r.full_name,
     r.phone,
     r.locality,
@@ -138,5 +143,4 @@ SELECT
     r.fasts_wednesday + r.fasts_complete_3days AS total_fasts,
     r.proclamations,
     r.idols_uprooted
-FROM accountability_returns r
-LEFT JOIN people pe ON pe.id = r.person_id;
+FROM accountability_returns r;

@@ -172,13 +172,17 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 .done p{color:var(--muted);margin:0 auto 2rem;max-width:44ch}
 .ticket{font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;color:var(--seal);
   border:1px solid var(--rule);padding:.8rem 1.5rem;display:inline-block;margin-bottom:1.6rem}
-.member-id{display:none;margin:0 0 1.6rem}
-.member-id[data-on="true"]{display:block}
-.member-id .lbl{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
-.member-id .code{font-family:var(--mono);font-size:1.6rem;font-weight:700;letter-spacing:.14em;
-  color:var(--paper);background:var(--seal);border:1px solid var(--seal-dark);
-  padding:.6rem 1.6rem;display:inline-block}
+.link-note{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--seal);margin:0 0 1.4rem}
+.confirm-panel{display:none;background:var(--band);border:1px solid var(--rule);
+  padding:1.4rem 1.6rem;margin:0 0 1.6rem;text-align:left}
+.confirm-panel[data-on="true"]{display:block}
+.confirm-panel p{margin:0 0 1rem;font-size:.88rem;color:var(--ink)}
+.confirm-choices{display:flex;flex-wrap:wrap;gap:.7rem}
+.confirm-choices button{font:inherit;font-size:.85rem;background:var(--paper);
+  border:1px solid var(--rule);padding:.6rem 1.1rem;cursor:pointer;transition:border-color .16s}
+.confirm-choices button:hover{border-color:var(--seal)}
+.confirm-choices button.none{color:var(--muted)}
 [hidden]{display:none!important}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
@@ -233,13 +237,10 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
       <div class="block-body">
         <div class="section-label" data-i18n="identLabel">Identification</div>
         <div class="row">
-          <label class="f lg"><span class="f-l" data-i18n="memberCode">Member ID (only if you have submitted before)</span><input class="f-i" name="member_code" autocomplete="off" placeholder="e.g. AB47K9"></label>
-        </div>
-        <p class="hint" data-i18n="memberCodeHint">Leave this blank the first time. You will be given an ID at the end to use for every report after this one.</p>
-        <div class="row">
           <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
           <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone" type="tel" autocomplete="tel"></label>
         </div>
+        <p class="hint" data-i18n="phoneHint">Your phone number links this report to your next one. Please use the same number every time.</p>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="locality">Locality</span><input class="f-i" name="locality"></label>
           <label class="f"><span class="f-l" data-i18n="province">Spiritual province or nation</span><input class="f-i" name="spiritual_province"></label>
@@ -399,10 +400,15 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 
 <div class="done" id="done" data-on="false">
   <h2 data-i18n="doneTitle">Your accounts are recorded</h2>
-  <div class="member-id" id="memberIdOut" data-on="false"></div>
+  <p class="link-note" id="linkNote"></p>
   <div class="ticket" id="ticket"></div>
   <p data-i18n="doneBody">Keep this reference number. Your locality secretary can look the entry up with it.</p>
   <button type="button" class="btn ghost" id="againBtn" data-i18n="again">Fill another form</button>
+</div>
+
+<div class="confirm-panel" id="confirmPanel" data-on="false">
+  <p data-i18n="confirmPrompt">We found other reports using this phone number. Which of these is you?</p>
+  <div class="confirm-choices" id="confirmChoices"></div>
 </div>
 
 <footer class="foot" id="foot">
@@ -425,10 +431,11 @@ const I18N = {
     ref:"Hebrews 13:7-8",
     verse:"Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.",
     begin:"Begin the form",railHead:"Entries",identLabel:"Identification",
-    memberCode:"Member ID (only if you have submitted before)",
-    memberCodeHint:"Leave this blank the first time. You will be given an ID at the end to use for every report after this one.",
-    newMemberLbl:"Your Member ID — save it for next time",
-    returningMemberLbl:"Linked to your existing record",
+    phoneHint:"Your phone number links this report to your next one. Please use the same number every time.",
+    confirmPrompt:"We found other reports using this phone number. Which of these is you?",
+    confirmNone:"None of these — this is my first report",
+    newPersonNote:"A new record was created for you.",
+    linkedNote:"Linked to your existing record.",
     name:"Name",phone:"Phone",locality:"Locality",province:"Spiritual province or nation",
     trimester:"Trimester",fromMonth:"From the month of",toMonth:"To the month of",
     h1:"I gave the accounts of",a1:"My walk with God",a2:"My studies",a3:"My finances",a4:"My service to God",
@@ -460,7 +467,6 @@ const I18N = {
     again:"Fill another form",
     errName:"Enter your name before submitting.",
     errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
-    errMemberCode:"That Member ID was not found. Leave the field blank if this is your first report, or check the ID with your locality secretary.",
     months:["January","February","March","April","May","June","July","August","September","October","November","December"]
   },
   fr:{
@@ -470,10 +476,11 @@ const I18N = {
     ref:"Hébreux 13:7-8",
     verse:"Souvenez-vous de vos conducteurs qui vous ont annoncé la parole de Dieu ; considérez quelle a été la fin de leur vie, et imitez leur foi. Jésus-Christ est le même hier, aujourd'hui, et éternellement.",
     begin:"Commencer la fiche",railHead:"Rubriques",identLabel:"Identification",
-    memberCode:"Identifiant membre (seulement si vous avez déjà soumis une fiche)",
-    memberCodeHint:"Laissez ce champ vide la première fois. Un identifiant vous sera donné à la fin, à utiliser pour chaque fiche suivante.",
-    newMemberLbl:"Votre identifiant membre — conservez-le pour la prochaine fois",
-    returningMemberLbl:"Lié à votre dossier existant",
+    phoneHint:"Votre numéro de téléphone relie cette fiche à la prochaine. Utilisez le même numéro à chaque fois.",
+    confirmPrompt:"Nous avons trouvé d'autres fiches utilisant ce numéro de téléphone. Laquelle est la vôtre ?",
+    confirmNone:"Aucune de celles-ci — c'est ma première fiche",
+    newPersonNote:"Un nouveau dossier a été créé pour vous.",
+    linkedNote:"Lié à votre dossier existant.",
     name:"Nom",phone:"Téléphone",locality:"Localité",province:"Province spirituelle ou nation",
     trimester:"Trimestre",fromMonth:"Du mois de",toMonth:"Au mois de",
     h1:"J'ai rendu compte de",a1:"Ma marche avec Dieu",a2:"Mes études",a3:"Mes finances",a4:"Mon service pour Dieu",
@@ -505,7 +512,6 @@ const I18N = {
     again:"Remplir une autre fiche",
     errName:"Entrez votre nom avant d'envoyer.",
     errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
-    errMemberCode:"Cet identifiant membre est introuvable. Laissez le champ vide s'il s'agit de votre première fiche, ou vérifiez l'identifiant auprès du secrétaire de votre localité.",
     months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
   }
 };
@@ -641,7 +647,65 @@ $('#beginBtn').addEventListener('click', () => $('#ident').scrollIntoView({ bloc
 $('#printBtn').addEventListener('click', () => window.print());
 $('#againBtn').addEventListener('click', () => { clearDraft(); location.reload(); });
 
-$('#submitBtn').addEventListener('click', async () => {
+function showDone(data){
+  const t = I18N[lang];
+  clearDraft();
+  say('', '');
+  $('#confirmPanel').dataset.on = 'false';
+  $('#formArea').hidden = true;
+  $('#foot').hidden = true;
+  $('#ticket').textContent = 'No. ' + data.id;
+  $('#linkNote').textContent = data.is_new_person ? t.newPersonNote : t.linkedNote;
+  $('#done').dataset.on = 'true';
+  window.scrollTo({ top: 0 });
+}
+
+async function submitReturn(extra){
+  const t = I18N[lang];
+  const btn = $('#submitBtn');
+  btn.disabled = true;
+  say(t.sending, '');
+  try {
+    const res = await fetch('/api/returns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...collect(), ...extra })
+    });
+    if (!res.ok) {
+      let errBody = null;
+      try { errBody = await res.json(); } catch (e) {}
+      if (res.status === 409 && errBody?.error === 'confirm_person') {
+        say('', '');
+        const choices = $('#confirmChoices');
+        choices.innerHTML = '';
+        errBody.candidates.forEach(c => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = c.full_name;
+          b.addEventListener('click', () => submitReturn({ person_id: c.id }));
+          choices.appendChild(b);
+        });
+        const none = document.createElement('button');
+        none.type = 'button';
+        none.className = 'none';
+        none.textContent = t.confirmNone;
+        none.addEventListener('click', () => submitReturn({ new_person: true }));
+        choices.appendChild(none);
+        $('#confirmPanel').dataset.on = 'true';
+        $('#confirmPanel').scrollIntoView({ block: 'center' });
+        btn.disabled = false;
+        return;
+      }
+      throw new Error('status ' + res.status);
+    }
+    showDone(await res.json());
+  } catch (e) {
+    say(t.errNet, 'bad');
+    btn.disabled = false;
+  }
+}
+
+$('#submitBtn').addEventListener('click', () => {
   const t = I18N[lang];
   const nameField = $('[name="full_name"]');
   if (!nameField.value.trim()){
@@ -650,44 +714,7 @@ $('#submitBtn').addEventListener('click', async () => {
     nameField.focus();
     return;
   }
-  const btn = $('#submitBtn');
-  btn.disabled = true;
-  say(t.sending, '');
-  try {
-    const res = await fetch('/api/returns', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(collect())
-    });
-    if (!res.ok) {
-      let errBody = null;
-      try { errBody = await res.json(); } catch (e) {}
-      if (res.status === 404 && errBody?.error === 'member_code_not_found') {
-        say(t.errMemberCode, 'bad');
-        const mcField = $('[name="member_code"]');
-        mcField.scrollIntoView({ block: 'center' });
-        mcField.focus();
-        btn.disabled = false;
-        return;
-      }
-      throw new Error('status ' + res.status);
-    }
-    const data = await res.json();
-    clearDraft();
-    say('', '');
-    $('#formArea').hidden = true;
-    $('#foot').hidden = true;
-    $('#ticket').textContent = 'No. ' + data.id;
-    const mcOut = $('#memberIdOut');
-    mcOut.innerHTML = '<div class="lbl">' + (data.is_new_member ? t.newMemberLbl : t.returningMemberLbl) +
-      '</div><div class="code">' + data.member_code + '</div>';
-    mcOut.dataset.on = 'true';
-    $('#done').dataset.on = 'true';
-    window.scrollTo({ top: 0 });
-  } catch (e) {
-    say(t.errNet, 'bad');
-    btn.disabled = false;
-  }
+  submitReturn({});
 });
 
 document.addEventListener('input', () => { refreshRail(); saveDraft(); });
