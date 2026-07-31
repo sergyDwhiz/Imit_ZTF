@@ -9,7 +9,7 @@
 <meta property="og:title" content="Imitators of ZTF Accountability Form">
 <meta property="og:description" content="Foundation Camp 2026. Imitators of ZTF.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%237A1F2B'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23FCFCFA' text-anchor='middle'%3EZ%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%237A1F2B'/%3E%3Ctext x='16' y='21' font-family='Georgia,serif' font-weight='700' font-size='12' fill='%23FCFCFA' text-anchor='middle'%3EZTF%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -105,10 +105,11 @@ h2 .n-inline{font-family:var(--mono);font-size:.8rem;color:var(--seal);margin-ri
 
 .row{display:flex;flex-wrap:wrap;gap:1.1rem 1.6rem}
 .row+.row{margin-top:1.1rem}
-.f{display:flex;flex-direction:column;gap:.3rem;flex:1 1 12rem;min-width:0}
-.f.sm{flex:0 1 7.5rem}
+.f{display:flex;flex-direction:column;gap:.3rem;flex:1 1 12rem}
+.f.sm{flex:0 1 auto}
 .f.lg{flex:1 1 100%}
-.f-l{font-size:.78rem;color:var(--muted)}
+.f-l{font-size:.85rem;font-weight:700;color:var(--ink);white-space:nowrap}
+.f.lg .f-l{white-space:normal}
 .f-i{font:inherit;font-family:var(--mono);font-size:.92rem;color:var(--ink);
   background:transparent;border:0;border-bottom:1px solid var(--rule);
   padding:.35rem .1rem;width:100%;border-radius:0;transition:border-color .16s,box-shadow .16s}
@@ -306,13 +307,9 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
       <div class="row">
         <label class="f sm"><span class="f-l" data-i18n="reached">People reached with the gospel</span><input class="f-i" name="people_reached" inputmode="numeric"></label>
         <label class="f sm"><span class="f-l" data-i18n="conv">Conversions</span><input class="f-i" name="conversions" inputmode="numeric"></label>
-      </div>
-      <div class="row">
         <label class="f sm"><span class="f-l" data-i18n="bapW">Baptised in water</span><input class="f-i" name="baptised_water" inputmode="numeric"></label>
         <label class="f sm"><span class="f-l" data-i18n="bapH">Baptised in the Holy Spirit</span><input class="f-i" name="baptised_holy_spirit" inputmode="numeric"></label>
         <label class="f sm"><span class="f-l" data-i18n="added">Added to the church</span><input class="f-i" name="added_to_church" inputmode="numeric"></label>
-      </div>
-      <div class="row">
         <label class="f sm"><span class="f-l" data-i18n="planted">Churches planted</span><input class="f-i" name="churches_planted" inputmode="numeric"></label>
         <label class="f"><span class="f-l" data-i18n="perChurch">Members per church</span><input class="f-i" name="members_per_church"></label>
       </div>
