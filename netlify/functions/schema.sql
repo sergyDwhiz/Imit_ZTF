@@ -114,8 +114,12 @@ CREATE INDEX IF NOT EXISTS idx_returns_province
 CREATE INDEX IF NOT EXISTS idx_returns_person
     ON accountability_returns (person_id, submitted_at DESC);
 
--- Convenience view for the province secretaries
-CREATE OR REPLACE VIEW accountability_summary AS
+-- Convenience view for the province secretaries.
+-- Dropped and recreated (rather than CREATE OR REPLACE) because the column
+-- list has changed shape since the view was first created, which CREATE OR
+-- REPLACE VIEW does not allow.
+DROP VIEW IF EXISTS accountability_summary;
+CREATE VIEW accountability_summary AS
 SELECT
     r.id,
     r.submitted_at,
