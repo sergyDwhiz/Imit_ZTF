@@ -1,99 +1,71 @@
-# CMFI Trimestral Accountability Form
+# Imitators of ZTF — Accountability Form
 
-Bilingual single page form (English / French) for the Foundation Camp 2026
-trimestral accountability. Static front end plus a Netlify serverless function
-writing to PostgreSQL.
+Bilingual (English / French) trimestral accountability form for Foundation
+Camp 2026. Static front end, a few Netlify serverless functions, PostgreSQL.
+
+**Live:** https://imitators-of-ztf-accountability-form.netlify.app
 
 ```
 public/index.html            the whole site, one file
 netlify/functions/
   returns.mjs                POST + GET /api/returns
-  migrate.mjs                GET /api/migrate?token=...
-  export.mjs                 GET /api/export?token=... (full CSV download)
+  migrate.mjs                GET /api/migrate?token=...     (create/update schema)
+  export.mjs                 GET /api/export?token=...      (full CSV of every field)
   health.mjs                 GET /api/health
-  _db.mjs                    connection, column list, type coercion
-  schema.sql                 table, indexes, summary view (single source of truth)
+  _db.mjs                    connection, column list, type coercion, phone/name normalising
+  schema.sql                 tables, indexes, summary view — single source of truth
 netlify.toml                 publish dir, function dir, headers
 ```
 
-## 1. Get a database
+## How a submission gets matched to a person
 
-Netlify does not host PostgreSQL, so pick a provider with a free tier.
-Neon (neon.tech) and Supabase both work. Create a database and copy the
-**pooled** connection string, not the direct one. Serverless functions open a
-new connection on every cold start and a direct connection will run out.
+There's no login. A submission is linked to an existing person by **phone
+number** (normalised to digits, country code required — the form has a
+country-code dropdown so a bare local number is never guessed at). If a
+phone number already has more than one name on record (e.g. siblings on a
+shared phone), the submitter is asked which one is them before saving. A
+second submission for a trimester that person already has on file is
+flagged too, so a resend isn't a silent duplicate.
 
-## 2. Deploy
+## Endpoints
 
-Push this folder to GitHub, then in Netlify: Add new site, Import an existing
-project, pick the repo. Netlify reads `netlify.toml`, so leave the build
-settings alone.
+| Method | Path           | Purpose                                  |
+|--------|----------------|-------------------------------------------|
+| POST   | `/api/returns` | Save a completed form                    |
+| GET    | `/api/returns` | Summary list, newest first — open, no token |
+| GET    | `/api/health`  | Database reachability                    |
+| GET    | `/api/migrate` | Create/update the schema, token required |
+| GET    | `/api/export`  | Full CSV, every field, token required — hand this URL to whoever needs the raw data |
 
-Under Site configuration, Environment variables, add:
-
-| Key             | Value                                             |
-|-----------------|---------------------------------------------------|
-| `DATABASE_URL`  | your pooled PostgreSQL connection string          |
-| `MIGRATE_TOKEN` | any long random string you invent                 |
-
-Deploy. The site is live.
-
-## 3. Create the table, once
-
-Open `https://YOUR-SITE.netlify.app/api/migrate?token=YOUR_MIGRATE_TOKEN`
-in a browser. It returns `{"status":"schema_ready"}`. Running it again is
-harmless, everything is `IF NOT EXISTS`.
-
-Check `https://YOUR-SITE.netlify.app/api/health` to confirm the database
-is reachable.
-
-## 4. Local development
+## Local development
 
 ```bash
 npm install
 npm install -g netlify-cli
-netlify env:pull            # or set DATABASE_URL in a .env file
+netlify link                # links this folder to the Netlify site
+netlify env:pull             # pulls DATABASE_URL / MIGRATE_TOKEN locally
 netlify dev
 ```
 
-`netlify dev` serves `public/` and the functions together on
-http://localhost:8888, with the same `/api/...` paths as production.
+Serves `public/` and the functions together on http://localhost:8888 with
+the same `/api/...` paths as production. Against a local PostgreSQL without
+SSL, add `PGSSL=false` to `.env`.
 
-Against a local PostgreSQL without SSL, add `PGSSL=false` to `.env`.
+## Redeploying elsewhere
 
-## Endpoints
-
-| Method | Path           | Purpose                              |
-|--------|----------------|---------------------------------------|
-| POST   | `/api/returns` | Save a completed form                |
-| GET    | `/api/returns` | Summary list, newest first           |
-| GET    | `/api/health`  | Database reachability                |
-| GET    | `/api/migrate` | Create the schema, token required    |
-| GET    | `/api/export`  | Full CSV of every field, token required |
+Pick a Postgres provider (Neon or Supabase), copy the **pooled** connection
+string (not direct — functions open a new connection per cold start). In
+Netlify: set `DATABASE_URL` and `MIGRATE_TOKEN` as environment variables,
+deploy, then open `/api/migrate?token=...` once to create the schema.
 
 ## Notes
 
-Drafts save to the browser as you type, so a dropped connection in the middle
-of entry 14 does not cost the whole form. The draft clears once a submission
-succeeds.
+Drafts autosave to the browser as you type, so a dropped connection doesn't
+cost the whole form. The draft clears once a submission succeeds.
 
 Every label lives in the `I18N` object near the bottom of `public/index.html`.
-Adding a third language means adding one key there and one button in the top
-bar. The language used is stored on each row in `form_language`.
+Adding a third language means one key there plus one button in the top bar.
 
-## Handing the full data to someone
-
-Open this URL in any browser — no database tools, no command line:
-
-```
-https://YOUR-SITE.netlify.app/api/export?token=YOUR_MIGRATE_TOKEN
-```
-
-It downloads a CSV with every field from every submission (not the trimmed
-summary), ready to open in Excel, Google Sheets, or hand off as-is. Same
-token as `/api/migrate` gates it, so don't share that token beyond whoever
-is allowed to pull the full dataset.
-
-`GET /api/returns` is open to anyone with the URL and only exposes the
-trimmed summary view. If even that shouldn't be public, put Netlify Identity
-or a shared token in front of it before you share the URL.
+`GET /api/returns` is open to anyone with the URL and exposes the trimmed
+summary (names, phone numbers, a handful of numeric fields) — not the full
+export. If that shouldn't be public, put a token or auth in front of it.
