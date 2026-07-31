@@ -432,29 +432,55 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
 // submitters are expected to be there, but it's always visible and
 // changeable, never silently assumed.
 const COUNTRY_CODES = [
-  ["237","Cameroon"],["234","Nigeria"],["233","Ghana"],["221","Senegal"],["225","Côte d'Ivoire"],
-  ["229","Benin"],["228","Togo"],["226","Burkina Faso"],["223","Mali"],["227","Niger"],
-  ["220","Gambia"],["224","Guinea"],["245","Guinea-Bissau"],["238","Cabo Verde"],["222","Mauritania"],
-  ["231","Liberia"],["232","Sierra Leone"],["236","Central African Republic"],["235","Chad"],
-  ["241","Gabon"],["242","Congo (Brazzaville)"],["243","Congo (DRC)"],["240","Equatorial Guinea"],
-  ["239","São Tomé and Príncipe"],["244","Angola"],["258","Mozambique"],["260","Zambia"],
-  ["263","Zimbabwe"],["267","Botswana"],["264","Namibia"],["266","Lesotho"],["268","Eswatini"],
-  ["27","South Africa"],["230","Mauritius"],["248","Seychelles"],["261","Madagascar"],
-  ["254","Kenya"],["255","Tanzania"],["256","Uganda"],["250","Rwanda"],["257","Burundi"],
-  ["251","Ethiopia"],["252","Somalia"],["253","Djibouti"],["291","Eritrea"],["211","South Sudan"],
-  ["249","Sudan"],["20","Egypt"],["218","Libya"],["216","Tunisia"],["213","Algeria"],["212","Morocco"],
-  ["1","United States / Canada"],["44","United Kingdom"],["33","France"],["49","Germany"],
-  ["32","Belgium"],["31","Netherlands"],["41","Switzerland"],["39","Italy"],["34","Spain"],
-  ["351","Portugal"],["353","Ireland"],["46","Sweden"],["47","Norway"],["45","Denmark"],
-  ["358","Finland"],["48","Poland"],["30","Greece"],["90","Türkiye"],["7","Russia / Kazakhstan"],
-  ["380","Ukraine"],["91","India"],["92","Pakistan"],["880","Bangladesh"],["94","Sri Lanka"],
-  ["977","Nepal"],["86","China"],["81","Japan"],["82","South Korea"],["852","Hong Kong"],
-  ["65","Singapore"],["60","Malaysia"],["66","Thailand"],["84","Vietnam"],["62","Indonesia"],
-  ["63","Philippines"],["971","United Arab Emirates"],["966","Saudi Arabia"],["974","Qatar"],
-  ["965","Kuwait"],["962","Jordan"],["961","Lebanon"],["972","Israel"],["964","Iraq"],["98","Iran"],
-  ["61","Australia"],["64","New Zealand"],["55","Brazil"],["54","Argentina"],["56","Chile"],
-  ["57","Colombia"],["52","Mexico"],["51","Peru"],["58","Venezuela"],["593","Ecuador"]
+  ["237","Cameroon","🇨🇲"],["234","Nigeria","🇳🇬"],["233","Ghana","🇬🇭"],["221","Senegal","🇸🇳"],["225","Côte d'Ivoire","🇨🇮"],
+  ["229","Benin","🇧🇯"],["228","Togo","🇹🇬"],["226","Burkina Faso","🇧🇫"],["223","Mali","🇲🇱"],["227","Niger","🇳🇪"],
+  ["220","Gambia","🇬🇲"],["224","Guinea","🇬🇳"],["245","Guinea-Bissau","🇬🇼"],["238","Cabo Verde","🇨🇻"],["222","Mauritania","🇲🇷"],
+  ["231","Liberia","🇱🇷"],["232","Sierra Leone","🇸🇱"],["236","Central African Republic","🇨🇫"],["235","Chad","🇹🇩"],
+  ["241","Gabon","🇬🇦"],["242","Congo (Brazzaville)","🇨🇬"],["243","Congo (DRC)","🇨🇩"],["240","Equatorial Guinea","🇬🇶"],
+  ["239","São Tomé and Príncipe","🇸🇹"],["244","Angola","🇦🇴"],["258","Mozambique","🇲🇿"],["260","Zambia","🇿🇲"],
+  ["263","Zimbabwe","🇿🇼"],["267","Botswana","🇧🇼"],["264","Namibia","🇳🇦"],["266","Lesotho","🇱🇸"],["268","Eswatini","🇸🇿"],
+  ["27","South Africa","🇿🇦"],["230","Mauritius","🇲🇺"],["248","Seychelles","🇸🇨"],["261","Madagascar","🇲🇬"],
+  ["254","Kenya","🇰🇪"],["255","Tanzania","🇹🇿"],["256","Uganda","🇺🇬"],["250","Rwanda","🇷🇼"],["257","Burundi","🇧🇮"],
+  ["251","Ethiopia","🇪🇹"],["252","Somalia","🇸🇴"],["253","Djibouti","🇩🇯"],["291","Eritrea","🇪🇷"],["211","South Sudan","🇸🇸"],
+  ["249","Sudan","🇸🇩"],["20","Egypt","🇪🇬"],["218","Libya","🇱🇾"],["216","Tunisia","🇹🇳"],["213","Algeria","🇩🇿"],["212","Morocco","🇲🇦"],
+  ["1","United States / Canada","🇺🇸"],["44","United Kingdom","🇬🇧"],["33","France","🇫🇷"],["49","Germany","🇩🇪"],
+  ["32","Belgium","🇧🇪"],["31","Netherlands","🇳🇱"],["41","Switzerland","🇨🇭"],["39","Italy","🇮🇹"],["34","Spain","🇪🇸"],
+  ["351","Portugal","🇵🇹"],["353","Ireland","🇮🇪"],["46","Sweden","🇸🇪"],["47","Norway","🇳🇴"],["45","Denmark","🇩🇰"],
+  ["358","Finland","🇫🇮"],["48","Poland","🇵🇱"],["30","Greece","🇬🇷"],["90","Türkiye","🇹🇷"],["7","Russia / Kazakhstan","🇷🇺"],
+  ["380","Ukraine","🇺🇦"],["91","India","🇮🇳"],["92","Pakistan","🇵🇰"],["880","Bangladesh","🇧🇩"],["94","Sri Lanka","🇱🇰"],
+  ["977","Nepal","🇳🇵"],["86","China","🇨🇳"],["81","Japan","🇯🇵"],["82","South Korea","🇰🇷"],["852","Hong Kong","🇭🇰"],
+  ["65","Singapore","🇸🇬"],["60","Malaysia","🇲🇾"],["66","Thailand","🇹🇭"],["84","Vietnam","🇻🇳"],["62","Indonesia","🇮🇩"],
+  ["63","Philippines","🇵🇭"],["971","United Arab Emirates","🇦🇪"],["966","Saudi Arabia","🇸🇦"],["974","Qatar","🇶🇦"],
+  ["965","Kuwait","🇰🇼"],["962","Jordan","🇯🇴"],["961","Lebanon","🇱🇧"],["972","Israel","🇮🇱"],["964","Iraq","🇮🇶"],["98","Iran","🇮🇷"],
+  ["61","Australia","🇦🇺"],["64","New Zealand","🇳🇿"],["55","Brazil","🇧🇷"],["54","Argentina","🇦🇷"],["56","Chile","🇨🇱"],
+  ["57","Colombia","🇨🇴"],["52","Mexico","🇲🇽"],["51","Peru","🇵🇪"],["58","Venezuela","🇻🇪"],["593","Ecuador","🇪🇨"]
 ];
+const CC_LIST = [...new Set(COUNTRY_CODES.map(c => c[0]))].sort((a,b) => b.length - a.length);
+
+// Someone typing (or pasting) their whole number as one blob — "+237677123456"
+// — instead of using the dropdown is the common case, not the exception.
+// Detect a leading country code so it isn't blindly duplicated on top of
+// whatever the dropdown happens to be set to. A "+"/"00" prefix is treated
+// as certain; a long bare digit string (more than a plausible local number)
+// is also checked, but a short one is left alone rather than guessed at.
+function detectCountryCode(raw){
+  let s = String(raw || '').trim();
+  if (s.startsWith('00')) s = '+' + s.slice(2);
+  let digits;
+  if (s.startsWith('+')) {
+    digits = s.slice(1).replace(/\D/g, '');
+  } else {
+    const stripped = s.replace(/\D/g, '');
+    if (stripped.length <= 10) return null;
+    digits = stripped;
+  }
+  for (const code of CC_LIST) {
+    if (digits.startsWith(code) && digits.length - code.length >= 6) {
+      return { cc: code, local: digits.slice(code.length) };
+    }
+  }
+  return null;
+}
 
 const I18N = {
   en:{
@@ -622,7 +648,7 @@ function applyLang(l){
   $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
   $$('select.cc').forEach(s => {
     const k = s.value;
-    s.innerHTML = COUNTRY_CODES.map(c => '<option value="'+c[0]+'">+'+c[0]+' '+c[1]+'</option>').join('');
+    s.innerHTML = COUNTRY_CODES.map(c => '<option value="'+c[0]+'">'+c[2]+' +'+c[0]+' '+c[1]+'</option>').join('');
     s.value = k || '237';
   });
   $$('select.month').forEach(s => {
@@ -646,6 +672,15 @@ function applyLang(l){
 }
 $$('.lang button').forEach(b => b.addEventListener('click', () => { applyLang(b.dataset.lang); saveDraft(); }));
 
+$('[name="phone_local"]').addEventListener('blur', function(){
+  const detected = detectCountryCode(this.value);
+  if (detected) {
+    $('[name="phone_cc"]').value = detected.cc;
+    this.value = detected.local;
+    saveDraft();
+  }
+});
+
 function collect(){
   const p = { form_language: lang };
   $$('#sheet [name]').forEach(el => { p[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
@@ -654,8 +689,10 @@ function collect(){
     pages: tr.querySelector('.lit-pages').value.trim(),
     author: tr.querySelector('.lit-author').value.trim()
   }));
-  const localDigits = (p.phone_local || '').replace(/\D/g, '');
-  p.phone = localDigits ? ('+' + p.phone_cc + localDigits) : '';
+  const detected = detectCountryCode(p.phone_local);
+  const cc = detected ? detected.cc : p.phone_cc;
+  const localDigits = (detected ? detected.local : (p.phone_local || '')).replace(/\D/g, '');
+  p.phone = localDigits ? ('+' + cc + localDigits) : '';
   return p;
 }
 function restore(p){
