@@ -136,7 +136,12 @@ export function coerce(column, raw) {
     if (raw === false || raw === 'false' || raw === 'no') return false;
     return null;
   }
-  if (raw === '' || raw === undefined || raw === null) return null;
+  if (raw === '' || raw === undefined || raw === null) {
+    // 0 means "not specified" — a real, comparable value rather than null,
+    // so two blank-trimester submissions from the same person still trip
+    // the duplicate check instead of silently skipping it.
+    return column === 'trimester_number' ? 0 : null;
+  }
   if (INTEGERS.has(column)) {
     const n = parseInt(raw, 10);
     return Number.isFinite(n) && n >= 0 ? n : null;

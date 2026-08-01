@@ -14,7 +14,7 @@ async function listPeople() {
       p.id,
       p.full_name,
       array_remove(array_agg(DISTINCT pp.phone), NULL) AS phones,
-      array_remove(array_agg(DISTINCT r.trimester_number), NULL) AS trimesters
+      array_remove(array_agg(DISTINCT NULLIF(r.trimester_number, 0)), NULL) AS trimesters
     FROM people p
     LEFT JOIN person_phones pp ON pp.person_id = p.id
     LEFT JOIN accountability_returns r ON r.person_id = p.id

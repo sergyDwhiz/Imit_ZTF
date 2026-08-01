@@ -125,7 +125,7 @@ function loadDetail(id){
         '<div class="field"><span class="label">' + escapeHtml(f.label) + '</span><span class="value">' + escapeHtml(formatValue(f.value)) + '</span></div>'
       ).join('');
       return '<div class="entry">' +
-        '<div class="entry-head"><span>Trimester ' + (e.trimester_number ?? '—') + ' · ' + dateStr + '</span>' +
+        '<div class="entry-head"><span>Trimester ' + (e.trimester_number ? e.trimester_number : 'Not specified') + ' · ' + dateStr + '</span>' +
         '<span class="type">' + (e.entry_type === 'goal' ? 'GOAL' : 'RESULT') + '</span></div>' +
         '<div class="entry-fields">' + (fields || '<p class="empty">No fields recorded.</p>') + '</div>' +
         '</div>';

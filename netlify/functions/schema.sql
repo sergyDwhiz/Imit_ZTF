@@ -50,7 +50,9 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
     full_name                   TEXT NOT NULL,
     phone                       TEXT NOT NULL,
     phone2                      TEXT,
-    trimester_number            SMALLINT CHECK (trimester_number BETWEEN 1 AND 4),
+    -- 0 means "not specified", not unknown/missing — a real, comparable
+    -- value so the duplicate-trimester check still applies to it.
+    trimester_number             SMALLINT NOT NULL DEFAULT 0 CHECK (trimester_number BETWEEN 0 AND 4),
     locality                    TEXT,
     spiritual_province          TEXT,
     month_from                  SMALLINT CHECK (month_from BETWEEN 1 AND 12),
@@ -145,6 +147,15 @@ ALTER TABLE accountability_returns
     ADD COLUMN IF NOT EXISTS entry_type TEXT NOT NULL DEFAULT 'result'
     CHECK (entry_type IN ('goal', 'result'));
 ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS phone2 TEXT;
+
+-- 0 now means "not specified" instead of leaving trimester_number null,
+-- so the duplicate check still applies to blank-trimester submissions.
+UPDATE accountability_returns SET trimester_number = 0 WHERE trimester_number IS NULL;
+ALTER TABLE accountability_returns ALTER COLUMN trimester_number SET DEFAULT 0;
+ALTER TABLE accountability_returns ALTER COLUMN trimester_number SET NOT NULL;
+ALTER TABLE accountability_returns DROP CONSTRAINT IF EXISTS accountability_returns_trimester_number_check;
+ALTER TABLE accountability_returns ADD CONSTRAINT accountability_returns_trimester_number_check
+    CHECK (trimester_number BETWEEN 0 AND 4);
 
 -- Not useful data for tracking anyone's progress — dropped, the EN/FR
 -- toggle on the form itself is untouched, this only stops recording it.
