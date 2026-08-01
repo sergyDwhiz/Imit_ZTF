@@ -66,7 +66,10 @@ const EXPORT_FIELDS = [
 
 function csvEscape(v) {
   if (v === null || v === undefined) return '';
-  const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+  let s;
+  if (v instanceof Date) s = v.toISOString();
+  else if (typeof v === 'object') s = JSON.stringify(v);
+  else s = String(v);
   return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 
