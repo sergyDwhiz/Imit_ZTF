@@ -150,10 +150,25 @@ ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS phone2 TEXT;
 
 -- 0 now means "not specified" instead of leaving trimester_number null,
 -- so the duplicate check still applies to blank-trimester submissions.
+-- The old constraint (1-4 only) must go first, or the UPDATE below that
+-- sets 0 would violate it. Dropped by scanning for it rather than by a
+-- fixed expected name — an earlier table rebuild left this one under an
+-- auto-suffixed name (a naming collision at the time), not the plain one.
+DO $$
+DECLARE con record;
+BEGIN
+  FOR con IN
+    SELECT conname FROM pg_constraint
+    WHERE conrelid = 'accountability_returns'::regclass
+      AND contype = 'c'
+      AND pg_get_constraintdef(oid) LIKE '%trimester_number%'
+  LOOP
+    EXECUTE 'ALTER TABLE accountability_returns DROP CONSTRAINT ' || quote_ident(con.conname);
+  END LOOP;
+END $$;
 UPDATE accountability_returns SET trimester_number = 0 WHERE trimester_number IS NULL;
 ALTER TABLE accountability_returns ALTER COLUMN trimester_number SET DEFAULT 0;
 ALTER TABLE accountability_returns ALTER COLUMN trimester_number SET NOT NULL;
-ALTER TABLE accountability_returns DROP CONSTRAINT IF EXISTS accountability_returns_trimester_number_check;
 ALTER TABLE accountability_returns ADD CONSTRAINT accountability_returns_trimester_number_check
     CHECK (trimester_number BETWEEN 0 AND 4);
 
