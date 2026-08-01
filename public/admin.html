@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imitators of ZTF — Records</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16211C; --paper:#FCFCFA; --band:#ECF2EA; --rule:#C3D4C4;
+  --seal:#7A1F2B; --seal-dark:#5E1621; --muted:#6C7A72; --canvas:#E7EBE5;
+  --display:"Newsreader",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px}
+header{background:var(--paper);border-bottom:1px solid var(--rule);padding:1.4rem 0}
+header h1{font-family:var(--display);font-weight:600;font-size:1.4rem;margin:0}
+header p{margin:.3rem 0 0;color:var(--muted);font-size:.85rem}
+main{padding:2rem 0 4rem}
+.gate{background:var(--paper);border:1px solid var(--rule);padding:2rem;text-align:center}
+.gate input{font:inherit;font-family:var(--mono);padding:.6rem .8rem;border:1px solid var(--rule);width:100%;max-width:24rem;margin:.8rem 0}
+.gate button{font:inherit;font-weight:600;background:var(--seal);color:var(--paper);border:0;padding:.7rem 1.6rem;cursor:pointer}
+.msg{color:var(--seal);font-size:.85rem;margin-top:.6rem}
+table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--rule)}
+th,td{text-align:left;padding:.8rem 1rem;border-bottom:1px solid var(--rule);font-size:.9rem}
+th{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--band)}
+tr.person-row{cursor:pointer}
+tr.person-row:hover td{background:var(--band)}
+.name-cell{font-weight:600}
+.count{color:var(--muted)}
+.back{display:inline-block;margin-bottom:1.2rem;font-family:var(--mono);font-size:.8rem;color:var(--seal);cursor:pointer;background:none;border:0;padding:0}
+.detail h2{font-family:var(--display);font-weight:600;font-size:1.6rem;margin:0 0 .3rem}
+.detail .phones{color:var(--muted);font-family:var(--mono);font-size:.85rem;margin:0 0 1.6rem}
+.entry{background:var(--paper);border:1px solid var(--rule);margin-bottom:1.2rem}
+.entry-head{background:var(--band);padding:.8rem 1.2rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
+.entry-head .type{font-weight:700;color:var(--seal)}
+.entry-fields{padding:.4rem 1.2rem}
+.field{display:flex;justify-content:space-between;gap:1.5rem;padding:.55rem 0;border-bottom:1px solid var(--band)}
+.field:last-child{border-bottom:0}
+.field .label{color:var(--muted);flex:0 0 auto;max-width:60%}
+.field .value{font-weight:500;text-align:right;word-break:break-word}
+.empty{color:var(--muted);padding:1rem 0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Imitators of ZTF — Records</h1>
+  <p>Click a name to see their full history.</p>
+</div></header>
+<main class="wrap">
+  <div id="gate" class="gate" hidden>
+    <p>Enter the admin token to view records.</p>
+    <input type="password" id="tokenInput" placeholder="Token" autocomplete="off">
+    <div><button id="tokenGo">View records</button></div>
+    <div class="msg" id="gateMsg"></div>
+  </div>
+  <div id="listView" hidden></div>
+  <div id="detailView" class="detail" hidden></div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+let token = new URLSearchParams(location.search).get('token') || '';
+let peopleCache = null;
+
+function api(path){
+  return fetch(path + (path.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token))
+    .then(res => res.ok ? res.json() : res.json().then(e => Promise.reject(e)));
+}
+
+function showGate(msg){
+  $('#gate').hidden = false;
+  $('#listView').hidden = true;
+  $('#detailView').hidden = true;
+  $('#gateMsg').textContent = msg || '';
+}
+
+function renderList(people){
+  peopleCache = people;
+  const rows = people.map(p => {
+    const phones = (p.phones || []).map(ph => '+' + ph).join(', ') || '—';
+    const trimesters = (p.trimesters || []).slice().sort((a,b)=>a-b).join(', ') || '—';
+    return '<tr class="person-row" data-id="' + p.id + '">' +
+      '<td class="name-cell">' + escapeHtml(p.full_name) + '</td>' +
+      '<td>' + escapeHtml(phones) + '</td>' +
+      '<td class="count">' + escapeHtml(trimesters) + '</td>' +
+      '</tr>';
+  }).join('');
+  $('#listView').innerHTML = people.length
+    ? '<table><thead><tr><th>Name</th><th>Phone Number(s)</th><th>Trimesters</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    : '<p class="empty">No submissions yet.</p>';
+  $$rows();
+  $('#gate').hidden = true;
+  $('#listView').hidden = false;
+  $('#detailView').hidden = true;
+}
+
+function $$rows(){
+  document.querySelectorAll('.person-row').forEach(tr => {
+    tr.addEventListener('click', () => loadDetail(tr.dataset.id));
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function formatValue(v){
+  if (v === true) return 'Yes';
+  if (v === false) return 'No';
+  if (Array.isArray(v)) return v.map(item => item && typeof item === 'object'
+    ? [item.title, item.author, item.pages].filter(Boolean).join(', ')
+    : String(item)).join('; ');
+  return String(v);
+}
+
+function loadDetail(id){
+  api('/api/people?id=' + encodeURIComponent(id)).then(data => {
+    const entries = data.entries.map(e => {
+      const dateStr = new Date(e.submitted_at).toLocaleDateString('en-GB');
+      const fields = e.fields.map(f =>
+        '<div class="field"><span class="label">' + escapeHtml(f.label) + '</span><span class="value">' + escapeHtml(formatValue(f.value)) + '</span></div>'
+      ).join('');
+      return '<div class="entry">' +
+        '<div class="entry-head"><span>Trimester ' + (e.trimester_number ?? '—') + ' · ' + dateStr + '</span>' +
+        '<span class="type">' + (e.entry_type === 'goal' ? 'GOAL' : 'RESULT') + '</span></div>' +
+        '<div class="entry-fields">' + (fields || '<p class="empty">No fields recorded.</p>') + '</div>' +
+        '</div>';
+    }).join('');
+    const phones = data.person.phones.map(p => '+' + p).join(', ') || '—';
+    $('#detailView').innerHTML =
+      '<button class="back" id="backBtn">&larr; Back to list</button>' +
+      '<h2>' + escapeHtml(data.person.full_name) + '</h2>' +
+      '<p class="phones">' + escapeHtml(phones) + '</p>' +
+      (entries || '<p class="empty">No submissions on file.</p>');
+    $('#backBtn').addEventListener('click', () => renderList(peopleCache));
+    $('#listView').hidden = true;
+    $('#detailView').hidden = false;
+  }).catch(err => showGate(err?.error === 'forbidden' ? 'Wrong token.' : 'Could not load that record.'));
+}
+
+function loadList(){
+  api('/api/people').then(renderList).catch(err => {
+    showGate(err?.error === 'forbidden' ? 'Wrong token.' : 'Could not load records.');
+  });
+}
+
+$('#tokenGo').addEventListener('click', () => {
+  token = $('#tokenInput').value.trim();
+  if (token) loadList();
+});
+$('#tokenInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('#tokenGo').click(); });
+
+if (token) loadList(); else showGate('');
+</script>
+</body>
+</html>
