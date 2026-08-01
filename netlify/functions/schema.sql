@@ -19,6 +19,23 @@ CREATE TABLE IF NOT EXISTS people (
 DROP VIEW IF EXISTS accountability_summary;
 ALTER TABLE people DROP COLUMN IF EXISTS member_code;
 
+-- A person can have more than one phone number over time (a second SIM, a
+-- changed number) or may simply give a second number up front so either
+-- one finds their record next time. Every number a person has ever
+-- submitted lives here; matching checks all of them, not just one.
+CREATE TABLE IF NOT EXISTS person_phones (
+    person_id                   BIGINT NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+    phone                       TEXT NOT NULL,
+    PRIMARY KEY (person_id, phone)
+);
+CREATE INDEX IF NOT EXISTS idx_person_phones_phone ON person_phones (phone);
+
+-- Backfill: every person created before this table existed only has their
+-- one phone recorded on the people row itself.
+INSERT INTO person_phones (person_id, phone)
+SELECT id, phone FROM people
+ON CONFLICT DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS accountability_returns (
     id                          BIGSERIAL PRIMARY KEY,
     submitted_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -32,6 +49,7 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
     -- Identification
     full_name                   TEXT NOT NULL,
     phone                       TEXT NOT NULL,
+    phone2                      TEXT,
     trimester_number            SMALLINT CHECK (trimester_number BETWEEN 1 AND 4),
     locality                    TEXT,
     spiritual_province          TEXT,
@@ -126,6 +144,7 @@ ALTER TABLE accountability_returns ALTER COLUMN phone SET NOT NULL;
 ALTER TABLE accountability_returns
     ADD COLUMN IF NOT EXISTS entry_type TEXT NOT NULL DEFAULT 'result'
     CHECK (entry_type IN ('goal', 'result'));
+ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS phone2 TEXT;
 
 -- Not useful data for tracking anyone's progress — dropped, the EN/FR
 -- toggle on the form itself is untouched, this only stops recording it.

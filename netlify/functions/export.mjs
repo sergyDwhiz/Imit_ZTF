@@ -14,6 +14,7 @@ const EXPORT_FIELDS = [
   ['entry_type', 'Goal or Result'],
   ['full_name', 'Name'],
   ['phone', 'Phone'],
+  ['phone2', 'Second Phone'],
   ['locality', 'Locality'],
   ['spiritual_province', 'Spiritual Province or Nation'],
   ['trimester_number', 'Trimester'],

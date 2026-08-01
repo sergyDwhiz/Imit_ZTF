@@ -13,7 +13,7 @@ const sql = postgres(process.env.DATABASE_URL, {
 export default sql;
 
 export const COLUMNS = [
-  'entry_type', 'full_name', 'phone', 'locality', 'spiritual_province',
+  'entry_type', 'full_name', 'phone', 'phone2', 'locality', 'spiritual_province',
   'trimester_number', 'month_from', 'month_to',
   'acct_walk_with_god', 'acct_studies', 'acct_finances', 'acct_service_to_god',
   'acct_given_to', 'acct_frequency',

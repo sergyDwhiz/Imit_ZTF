@@ -242,6 +242,11 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
         </div>
         <p class="hint" data-i18n="phoneHint">Your phone number links this report to your next one. Please use the same number every time.</p>
         <div class="row">
+          <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone2_cc"></select></label>
+          <label class="f"><span class="f-l" data-i18n="phone2">Second phone number (optional)</span><input class="f-i" name="phone2_local" type="tel" inputmode="tel" autocomplete="tel"></label>
+        </div>
+        <p class="hint" data-i18n="phone2Hint">If you sometimes use a different number, add it here too — either one will find your record next time.</p>
+        <div class="row">
           <label class="f"><span class="f-l" data-i18n="locality">Locality</span><input class="f-i" name="locality"></label>
           <label class="f"><span class="f-l" data-i18n="province">Spiritual province or nation</span><input class="f-i" name="spiritual_province"></label>
         </div>
@@ -487,6 +492,8 @@ const I18N = {
     verse:"Remember them which have the rule over you, who have spoken unto you the word of God: whose faith follow, considering the end of their conversation. Jesus Christ the same yesterday, and to day, and for ever.",
     begin:"Begin the form",railHead:"Entries",identLabel:"Identification",
     phoneHint:"Your phone number links this report to your next one. Please use the same number every time.",
+    phone2:"Second phone number (optional)",
+    phone2Hint:"If you sometimes use a different number, add it here too — either one will find your record next time.",
     confirmPrompt:"We found other reports using this phone number. Which of these is you?",
     confirmNone:"None of these — this is my first report",
     newPersonNote:"A new record was created for you.",
@@ -536,6 +543,8 @@ const I18N = {
     verse:"Souvenez-vous de vos conducteurs qui vous ont annoncé la parole de Dieu ; considérez quelle a été la fin de leur vie, et imitez leur foi. Jésus-Christ est le même hier, aujourd'hui, et éternellement.",
     begin:"Commencer la fiche",railHead:"Rubriques",identLabel:"Identification",
     phoneHint:"Votre numéro de téléphone relie cette fiche à la prochaine. Utilisez le même numéro à chaque fois.",
+    phone2:"Deuxième numéro de téléphone (facultatif)",
+    phone2Hint:"Si vous utilisez parfois un autre numéro, ajoutez-le aussi ici — l'un ou l'autre retrouvera votre dossier la prochaine fois.",
     confirmPrompt:"Nous avons trouvé d'autres fiches utilisant ce numéro de téléphone. Laquelle est la vôtre ?",
     confirmNone:"Aucune de celles-ci — c'est ma première fiche",
     newPersonNote:"Un nouveau dossier a été créé pour vous.",
@@ -686,14 +695,25 @@ function applyLang(l){
 }
 $$('.lang button').forEach(b => b.addEventListener('click', () => { applyLang(b.dataset.lang); saveDraft(); }));
 
-$('[name="phone_local"]').addEventListener('blur', function(){
-  const detected = detectCountryCode(this.value);
-  if (detected) {
-    $('[name="phone_cc"]').value = detected.cc;
-    this.value = detected.local;
-    saveDraft();
-  }
-});
+function wirePhoneBlur(localName, ccName){
+  $('[name="' + localName + '"]').addEventListener('blur', function(){
+    const detected = detectCountryCode(this.value);
+    if (detected) {
+      $('[name="' + ccName + '"]').value = detected.cc;
+      this.value = detected.local;
+      saveDraft();
+    }
+  });
+}
+wirePhoneBlur('phone_local', 'phone_cc');
+wirePhoneBlur('phone2_local', 'phone2_cc');
+
+function combinePhone(p, localKey, ccKey){
+  const detected = detectCountryCode(p[localKey]);
+  const cc = detected ? detected.cc : p[ccKey];
+  const localDigits = (detected ? detected.local : (p[localKey] || '')).replace(/\D/g, '');
+  return localDigits ? ('+' + cc + localDigits) : '';
+}
 
 function collect(){
   const p = { entry_type: entryType };
@@ -703,10 +723,8 @@ function collect(){
     pages: tr.querySelector('.lit-pages').value.trim(),
     author: tr.querySelector('.lit-author').value.trim()
   }));
-  const detected = detectCountryCode(p.phone_local);
-  const cc = detected ? detected.cc : p.phone_cc;
-  const localDigits = (detected ? detected.local : (p.phone_local || '')).replace(/\D/g, '');
-  p.phone = localDigits ? ('+' + cc + localDigits) : '';
+  p.phone = combinePhone(p, 'phone_local', 'phone_cc');
+  p.phone2 = combinePhone(p, 'phone2_local', 'phone2_cc');
   return p;
 }
 function restore(p){

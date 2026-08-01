@@ -1,42 +1,66 @@
 import sql, { buildRow, json, normPhone, normName } from './_db.mjs';
 
-// people.phone always stores the normalised digits, never what was typed —
-// that's what makes the exact-match lookup below reliable regardless of
-// whether a submission included a country code or not.
-async function createPerson(body) {
+// The primary phone plus the optional second number, normalised and
+// deduplicated. A person can be found later by either one.
+function submittedPhones(body) {
+  return [...new Set([normPhone(body.phone), body.phone2 ? normPhone(body.phone2) : null].filter(Boolean))];
+}
+
+async function recordPhones(personId, phones) {
+  for (const phone of phones) {
+    await sql`INSERT INTO person_phones (person_id, phone) VALUES (${personId}, ${phone}) ON CONFLICT DO NOTHING`;
+  }
+}
+
+async function createPerson(body, phones) {
   const [person] = await sql`
     INSERT INTO people (full_name, phone)
-    VALUES (${String(body.full_name).trim()}, ${normPhone(body.phone)})
-    RETURNING id, full_name, phone
+    VALUES (${String(body.full_name).trim()}, ${phones[0]})
+    RETURNING id, full_name
   `;
+  await recordPhones(person.id, phones);
   return person;
 }
 
-// Matches a submission to a person by phone number. A phone with no prior
-// name match (new sibling on a shared phone, or the same person's name
-// drifted since last time) comes back as `candidates` instead of a
-// resolved person — the client must ask the submitter which one is them
-// and resubmit with either `person_id` or `new_person: true` set.
+// Matches a submission to a person by phone number — checking every number
+// on record for every person, not just one, since a person can have more
+// than one (a second SIM, a changed number, or one given up front). A
+// phone with no prior name match (new sibling on a shared phone, or the
+// same person's name drifted since last time) comes back as `candidates`
+// instead of a resolved person — the client must ask the submitter which
+// one is them and resubmit with either `person_id` or `new_person: true`
+// set. Whichever numbers were submitted this time are recorded against the
+// resolved person, so a second number typed later still links up.
 async function resolvePerson(body) {
-  const phone = normPhone(body.phone);
+  const phones = submittedPhones(body);
 
   if (body.person_id) {
-    const [person] = await sql`SELECT id, full_name, phone FROM people WHERE id = ${body.person_id}`;
-    if (!person || person.phone !== phone) return null;
+    const [person] = await sql`SELECT id, full_name FROM people WHERE id = ${body.person_id}`;
+    if (!person) return null;
+    const [known] = await sql`
+      SELECT 1 FROM person_phones WHERE person_id = ${body.person_id} AND phone = ANY(${phones})
+    `;
+    if (!known) return null;
+    await recordPhones(person.id, phones);
     return { person, isNew: false };
   }
 
   if (body.new_person) {
-    return { person: await createPerson(body), isNew: true };
+    return { person: await createPerson(body, phones), isNew: true };
   }
 
-  const matches = await sql`SELECT id, full_name, phone FROM people WHERE phone = ${phone}`;
+  const matches = await sql`
+    SELECT DISTINCT p.id, p.full_name FROM people p
+    JOIN person_phones pp ON pp.person_id = p.id
+    WHERE pp.phone = ANY(${phones})
+  `;
   if (matches.length === 0) {
-    return { person: await createPerson(body), isNew: true };
+    return { person: await createPerson(body, phones), isNew: true };
   }
 
   const exact = matches.filter(m => normName(m.full_name) === normName(body.full_name));
   if (exact.length === 1) {
+    await recordPhones(exact[0].id, phones);
     return { person: exact[0], isNew: false };
   }
 
