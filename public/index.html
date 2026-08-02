@@ -542,6 +542,7 @@ const I18N = {
     errPhone:"Enter your phone number before submitting — it's what links this report to your next one.",
     errLocality:"Enter your locality before submitting — without a phone, it's what links this report to your next one.",
     errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
+    errServer:"Something went wrong on our end — this isn't a connection problem. Please try submitting again; your answers are still here.",
     months:["January","February","March","April","May","June","July","August","September","October","November","December"]
   },
   fr:{
@@ -596,6 +597,7 @@ const I18N = {
     errPhone:"Entrez votre numéro de téléphone avant d'envoyer — c'est ce qui relie cette fiche à la prochaine.",
     errLocality:"Entrez votre localité avant d'envoyer — sans téléphone, c'est ce qui relie cette fiche à la prochaine.",
     errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
+    errServer:"Une erreur s'est produite de notre côté — ce n'est pas un problème de connexion. Veuillez réessayer d'envoyer ; vos réponses sont conservées.",
     months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
   }
 };
@@ -800,73 +802,104 @@ async function submitReturn(extra){
   const btn = $('#submitBtn');
   btn.disabled = true;
   say(t.sending, '');
+
+  // A thrown fetch means the request never reached the server at all — a
+  // genuine connectivity problem, and the only case where "check your
+  // connection" is actually the right message.
+  let res;
   try {
-    const res = await fetch('/api/returns', {
+    res = await fetch('/api/returns', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...collect(), ...extra })
     });
-    if (!res.ok) {
-      let errBody = null;
-      try { errBody = await res.json(); } catch (e) {}
-
-      if (res.status === 409 && errBody?.error === 'confirm_person') {
-        say('', '');
-        $('#confirmPromptText').textContent = t.confirmPrompt;
-        const choices = $('#confirmChoices');
-        choices.innerHTML = '';
-        errBody.candidates.forEach(c => {
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.textContent = c.full_name;
-          b.addEventListener('click', () => submitReturn({ person_id: c.id }));
-          choices.appendChild(b);
-        });
-        const none = document.createElement('button');
-        none.type = 'button';
-        none.className = 'none';
-        none.textContent = t.confirmNone;
-        none.addEventListener('click', () => submitReturn({ new_person: true }));
-        choices.appendChild(none);
-        $('#confirmPanel').dataset.on = 'true';
-        $('#confirmPanel').scrollIntoView({ block: 'center' });
-        btn.disabled = false;
-        return;
-      }
-
-      if (res.status === 409 && errBody?.error === 'duplicate_trimester') {
-        say('', '');
-        const dateStr = new Date(errBody.existing.submitted_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB');
-        $('#confirmPromptText').textContent = t.duplicatePrompt
-          .replace('{type}', errBody.entry_type === 'goal' ? t.typeGoalNoun : t.typeResultNoun)
-          .replace('{n}', errBody.trimester_number)
-          .replace('{date}', dateStr);
-        const choices = $('#confirmChoices');
-        choices.innerHTML = '';
-        const again = document.createElement('button');
-        again.type = 'button';
-        again.textContent = t.duplicateSubmit;
-        again.addEventListener('click', () => submitReturn({ ...extra, confirm_duplicate: true }));
-        choices.appendChild(again);
-        const cancel = document.createElement('button');
-        cancel.type = 'button';
-        cancel.className = 'none';
-        cancel.textContent = t.duplicateCancel;
-        cancel.addEventListener('click', () => { $('#confirmPanel').dataset.on = 'false'; });
-        choices.appendChild(cancel);
-        $('#confirmPanel').dataset.on = 'true';
-        $('#confirmPanel').scrollIntoView({ block: 'center' });
-        btn.disabled = false;
-        return;
-      }
-
-      throw new Error('status ' + res.status);
-    }
-    showDone(await res.json());
   } catch (e) {
     say(t.errNet, 'bad');
     btn.disabled = false;
+    return;
   }
+
+  if (res.ok) {
+    showDone(await res.json());
+    return;
+  }
+
+  let errBody = null;
+  try { errBody = await res.json(); } catch (e) {}
+
+  if (res.status === 409 && errBody?.error === 'confirm_person') {
+    say('', '');
+    $('#confirmPromptText').textContent = t.confirmPrompt;
+    const choices = $('#confirmChoices');
+    choices.innerHTML = '';
+    errBody.candidates.forEach(c => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = c.full_name;
+      b.addEventListener('click', () => submitReturn({ person_id: c.id }));
+      choices.appendChild(b);
+    });
+    const none = document.createElement('button');
+    none.type = 'button';
+    none.className = 'none';
+    none.textContent = t.confirmNone;
+    none.addEventListener('click', () => submitReturn({ new_person: true }));
+    choices.appendChild(none);
+    $('#confirmPanel').dataset.on = 'true';
+    $('#confirmPanel').scrollIntoView({ block: 'center' });
+    btn.disabled = false;
+    return;
+  }
+
+  if (res.status === 409 && errBody?.error === 'duplicate_trimester') {
+    say('', '');
+    const dateStr = new Date(errBody.existing.submitted_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB');
+    $('#confirmPromptText').textContent = t.duplicatePrompt
+      .replace('{type}', errBody.entry_type === 'goal' ? t.typeGoalNoun : t.typeResultNoun)
+      .replace('{n}', errBody.trimester_number)
+      .replace('{date}', dateStr);
+    const choices = $('#confirmChoices');
+    choices.innerHTML = '';
+    const again = document.createElement('button');
+    again.type = 'button';
+    again.textContent = t.duplicateSubmit;
+    again.addEventListener('click', () => submitReturn({ ...extra, confirm_duplicate: true }));
+    choices.appendChild(again);
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'none';
+    cancel.textContent = t.duplicateCancel;
+    cancel.addEventListener('click', () => { $('#confirmPanel').dataset.on = 'false'; });
+    choices.appendChild(cancel);
+    $('#confirmPanel').dataset.on = 'true';
+    $('#confirmPanel').scrollIntoView({ block: 'center' });
+    btn.disabled = false;
+    return;
+  }
+
+  // A validation error the server caught that client-side checks should
+  // have already prevented — point at the actual field instead of the
+  // misleading "check your connection", since the request did reach the
+  // server fine.
+  const fieldErrors = {
+    missing_name: ['full_name', t.errName],
+    missing_phone: ['phone_local', t.errPhone],
+    missing_locality: ['locality', t.errLocality]
+  };
+  const mapped = fieldErrors[errBody?.error];
+  if (mapped) {
+    say(mapped[1], 'bad');
+    const field = $('[name="' + mapped[0] + '"]');
+    if (field) { field.scrollIntoView({ block: 'center' }); field.focus(); }
+    btn.disabled = false;
+    return;
+  }
+
+  // Reached the server, but something failed there in a way not covered
+  // above (db error, stale confirm-panel state, etc). Distinct from the
+  // network message on purpose — this is not a connectivity problem.
+  say(t.errServer, 'bad');
+  btn.disabled = false;
 }
 
 $('#submitBtn').addEventListener('click', () => {
