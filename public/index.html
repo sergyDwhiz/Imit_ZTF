@@ -237,15 +237,21 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
         <div class="section-label" data-i18n="identLabel">Identification</div>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
-          <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone_cc"></select></label>
-          <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone_local" type="tel" inputmode="tel" autocomplete="tel"></label>
         </div>
-        <p class="hint" data-i18n="phoneHint">Your phone number links this report to your next one. Please use the same number every time.</p>
-        <div class="row">
-          <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone2_cc"></select></label>
-          <label class="f"><span class="f-l" data-i18n="phone2">Second phone number (optional)</span><input class="f-i" name="phone2_local" type="tel" inputmode="tel" autocomplete="tel"></label>
+        <div id="phoneFields">
+          <div class="row">
+            <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone_cc"></select></label>
+            <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone_local" type="tel" inputmode="tel" autocomplete="tel"></label>
+          </div>
+          <p class="hint" data-i18n="phoneHint">Your phone number links this report to your next one. Please use the same number every time.</p>
+          <div class="row">
+            <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone2_cc"></select></label>
+            <label class="f"><span class="f-l" data-i18n="phone2">Second phone number (optional)</span><input class="f-i" name="phone2_local" type="tel" inputmode="tel" autocomplete="tel"></label>
+          </div>
+          <p class="hint" data-i18n="phone2Hint">If you sometimes use a different number, add it here too — either one will find your record next time.</p>
         </div>
-        <p class="hint" data-i18n="phone2Hint">If you sometimes use a different number, add it here too — either one will find your record next time.</p>
+        <label class="tick" style="margin-bottom:1.2rem"><input type="checkbox" name="no_phone" id="noPhoneCheck"><span class="box"></span><span data-i18n="noPhone">I don't have any phone at all</span></label>
+        <p class="hint" id="noPhoneHint" data-i18n="noPhoneHint" hidden>Without a phone, your locality is used instead to find your record next time — please fill it in carefully and the same way each time.</p>
         <div class="row">
           <label class="f"><span class="f-l" data-i18n="locality">Locality</span><input class="f-i" name="locality"></label>
           <label class="f"><span class="f-l" data-i18n="province">Spiritual province or nation</span><input class="f-i" name="spiritual_province"></label>
@@ -494,6 +500,8 @@ const I18N = {
     phoneHint:"Your phone number links this report to your next one. Please use the same number every time.",
     phone2:"Second phone number (optional)",
     phone2Hint:"If you sometimes use a different number, add it here too — either one will find your record next time.",
+    noPhone:"I don't have any phone at all",
+    noPhoneHint:"Without a phone, your locality is used instead to find your record next time — please fill it in carefully and the same way each time.",
     confirmPrompt:"We found other reports using this phone number. Which of these is you?",
     confirmNone:"None of these — this is my first report",
     newPersonNote:"A new record was created for you.",
@@ -532,6 +540,7 @@ const I18N = {
     again:"Fill another form",
     errName:"Enter your name before submitting.",
     errPhone:"Enter your phone number before submitting — it's what links this report to your next one.",
+    errLocality:"Enter your locality before submitting — without a phone, it's what links this report to your next one.",
     errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
     months:["January","February","March","April","May","June","July","August","September","October","November","December"]
   },
@@ -545,6 +554,8 @@ const I18N = {
     phoneHint:"Votre numéro de téléphone relie cette fiche à la prochaine. Utilisez le même numéro à chaque fois.",
     phone2:"Deuxième numéro de téléphone (facultatif)",
     phone2Hint:"Si vous utilisez parfois un autre numéro, ajoutez-le aussi ici — l'un ou l'autre retrouvera votre dossier la prochaine fois.",
+    noPhone:"Je n'ai aucun téléphone",
+    noPhoneHint:"Sans téléphone, votre localité est utilisée à la place pour retrouver votre dossier la prochaine fois — veuillez la remplir avec soin et de la même façon à chaque fois.",
     confirmPrompt:"Nous avons trouvé d'autres fiches utilisant ce numéro de téléphone. Laquelle est la vôtre ?",
     confirmNone:"Aucune de celles-ci — c'est ma première fiche",
     newPersonNote:"Un nouveau dossier a été créé pour vous.",
@@ -583,6 +594,7 @@ const I18N = {
     again:"Remplir une autre fiche",
     errName:"Entrez votre nom avant d'envoyer.",
     errPhone:"Entrez votre numéro de téléphone avant d'envoyer — c'est ce qui relie cette fiche à la prochaine.",
+    errLocality:"Entrez votre localité avant d'envoyer — sans téléphone, c'est ce qui relie cette fiche à la prochaine.",
     errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
     months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
   }
@@ -708,6 +720,12 @@ function wirePhoneBlur(localName, ccName){
 wirePhoneBlur('phone_local', 'phone_cc');
 wirePhoneBlur('phone2_local', 'phone2_cc');
 
+function applyNoPhone(on){
+  $('#phoneFields').hidden = on;
+  $('#noPhoneHint').hidden = !on;
+}
+$('#noPhoneCheck').addEventListener('change', function(){ applyNoPhone(this.checked); saveDraft(); });
+
 function combinePhone(p, localKey, ccKey){
   const detected = detectCountryCode(p[localKey]);
   const cc = detected ? detected.cc : p[ccKey];
@@ -723,8 +741,8 @@ function collect(){
     pages: tr.querySelector('.lit-pages').value.trim(),
     author: tr.querySelector('.lit-author').value.trim()
   }));
-  p.phone = combinePhone(p, 'phone_local', 'phone_cc');
-  p.phone2 = combinePhone(p, 'phone2_local', 'phone2_cc');
+  p.phone = p.no_phone ? '' : combinePhone(p, 'phone_local', 'phone_cc');
+  p.phone2 = p.no_phone ? '' : combinePhone(p, 'phone2_local', 'phone2_cc');
   return p;
 }
 function restore(p){
@@ -736,6 +754,7 @@ function restore(p){
     if (el.type === 'checkbox') el.checked = !!p[el.name];
     else el.value = p[el.name];
   });
+  applyNoPhone($('#noPhoneCheck').checked);
   Array.from($('#litBody').children).forEach((tr,i) => {
     const r = (p.literature || [])[i];
     if (!r) return;
@@ -859,12 +878,22 @@ $('#submitBtn').addEventListener('click', () => {
     nameField.focus();
     return;
   }
-  const phoneField = $('[name="phone_local"]');
-  if (!phoneField.value.trim()){
-    say(t.errPhone, 'bad');
-    phoneField.scrollIntoView({ block:'center' });
-    phoneField.focus();
-    return;
+  if ($('#noPhoneCheck').checked) {
+    const localityField = $('[name="locality"]');
+    if (!localityField.value.trim()){
+      say(t.errLocality, 'bad');
+      localityField.scrollIntoView({ block:'center' });
+      localityField.focus();
+      return;
+    }
+  } else {
+    const phoneField = $('[name="phone_local"]');
+    if (!phoneField.value.trim()){
+      say(t.errPhone, 'bad');
+      phoneField.scrollIntoView({ block:'center' });
+      phoneField.focus();
+      return;
+    }
   }
   submitReturn({});
 });

@@ -15,11 +15,34 @@ async function recordPhones(personId, phones) {
 async function createPerson(body, phones) {
   const [person] = await sql`
     INSERT INTO people (full_name, phone)
-    VALUES (${String(body.full_name).trim()}, ${phones[0]})
+    VALUES (${String(body.full_name).trim()}, ${phones[0] || null})
     RETURNING id, full_name
   `;
   await recordPhones(person.id, phones);
   return person;
+}
+
+// Fallback for someone with no phone at all — not even a shared or
+// borrowed one. Matches by name + locality instead, and only against
+// other phone-less people (people.phone IS NULL): a name+locality
+// coincidence must never attach a submission to someone who actually has
+// a phone-verified identity, so the two matching paths stay fully
+// separate. Weaker than phone matching (names collide more easily), which
+// is why it only applies when phone genuinely isn't available.
+async function resolvePersonByNameLocality(body) {
+  const name = normName(body.full_name);
+  const locality = normName(body.locality);
+
+  const matches = await sql`
+    SELECT DISTINCT p.id, p.full_name FROM people p
+    JOIN accountability_returns r ON r.person_id = p.id
+    WHERE p.phone IS NULL
+      AND lower(trim(p.full_name)) = ${name}
+      AND lower(trim(r.locality)) = ${locality}
+  `;
+  if (matches.length === 0) return { person: await createPerson(body, []), isNew: true };
+  if (matches.length === 1) return { person: matches[0], isNew: false };
+  return { candidates: matches.map(m => ({ id: m.id, full_name: m.full_name })) };
 }
 
 // Matches a submission to a person by phone number — checking every number
@@ -32,11 +55,14 @@ async function createPerson(body, phones) {
 // set. Whichever numbers were submitted this time are recorded against the
 // resolved person, so a second number typed later still links up.
 async function resolvePerson(body) {
-  const phones = submittedPhones(body);
-
   if (body.person_id) {
-    const [person] = await sql`SELECT id, full_name FROM people WHERE id = ${body.person_id}`;
+    const [person] = await sql`SELECT id, full_name, phone FROM people WHERE id = ${body.person_id}`;
     if (!person) return null;
+    if (body.no_phone) {
+      if (person.phone !== null) return null;
+      return { person, isNew: false };
+    }
+    const phones = submittedPhones(body);
     const [known] = await sql`
       SELECT 1 FROM person_phones WHERE person_id = ${body.person_id} AND phone = ANY(${phones})
     `;
@@ -45,6 +71,12 @@ async function resolvePerson(body) {
     return { person, isNew: false };
   }
 
+  if (body.no_phone) {
+    if (body.new_person) return { person: await createPerson(body, []), isNew: true };
+    return resolvePersonByNameLocality(body);
+  }
+
+  const phones = submittedPhones(body);
   if (body.new_person) {
     return { person: await createPerson(body, phones), isNew: true };
   }
@@ -79,9 +111,15 @@ export default async (req) => {
     if (!body?.full_name || !String(body.full_name).trim()) {
       return json({ error: 'missing_name' }, 400);
     }
-    // Required: it's the only thing that links this submission to the
-    // person's next one. Without it every submission becomes an orphan.
-    if (!body?.phone || !String(body.phone).trim()) {
+    if (body.no_phone) {
+      // With no phone, locality is the only other piece of the fallback
+      // match — without it there'd be nothing but a name to go on.
+      if (!body?.locality || !String(body.locality).trim()) {
+        return json({ error: 'missing_locality' }, 400);
+      }
+    } else if (!body?.phone || !String(body.phone).trim()) {
+      // Required: it's the only thing that links this submission to the
+      // person's next one. Without it every submission becomes an orphan.
       return json({ error: 'missing_phone' }, 400);
     }
 

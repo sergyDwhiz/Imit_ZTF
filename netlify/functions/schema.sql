@@ -6,10 +6,13 @@
 -- row by phone number (normalised to digits only); if that phone has more
 -- than one name on record (e.g. siblings sharing a household phone), the
 -- submitter is asked to pick which one is them rather than guessing.
+-- phone is nullable: someone with no phone at all (not even a shared or
+-- borrowed one) is matched by name + locality instead — weaker, but the
+-- only option when there is truly no number to use.
 CREATE TABLE IF NOT EXISTS people (
     id                          BIGSERIAL PRIMARY KEY,
     full_name                   TEXT NOT NULL,
-    phone                       TEXT NOT NULL,
+    phone                       TEXT,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -48,7 +51,7 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
 
     -- Identification
     full_name                   TEXT NOT NULL,
-    phone                       TEXT NOT NULL,
+    phone                       TEXT,
     phone2                      TEXT,
     -- 0 means "not specified", not unknown/missing — a real, comparable
     -- value so the duplicate-trimester check still applies to it.
@@ -141,8 +144,11 @@ CREATE TABLE IF NOT EXISTS accountability_returns (
 -- the initial release via ALTER TABLE, rather than being present in the
 -- CREATE TABLE above from the start (a fresh database already has them).
 ALTER TABLE accountability_returns ADD COLUMN IF NOT EXISTS person_id BIGINT REFERENCES people(id);
-ALTER TABLE people ALTER COLUMN phone SET NOT NULL;
-ALTER TABLE accountability_returns ALTER COLUMN phone SET NOT NULL;
+-- Reversed from an earlier revision: phone was made required, but someone
+-- with no phone at all still needs to be able to submit (matched by name +
+-- locality instead).
+ALTER TABLE people ALTER COLUMN phone DROP NOT NULL;
+ALTER TABLE accountability_returns ALTER COLUMN phone DROP NOT NULL;
 ALTER TABLE accountability_returns
     ADD COLUMN IF NOT EXISTS entry_type TEXT NOT NULL DEFAULT 'result'
     CHECK (entry_type IN ('goal', 'result'));
