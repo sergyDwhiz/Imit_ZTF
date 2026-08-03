@@ -607,6 +607,19 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 let lang = (navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en';
 
+// localStorage throws in some browsers/embedded webviews (Safari private
+// mode, in-app browsers like WhatsApp or Facebook's — common for links
+// shared this way) instead of just being unavailable. An unguarded call
+// anywhere at the top level halts the whole script before a single event
+// listener attaches, which breaks everything on the page, not just
+// drafts/stickiness — so every access goes through this wrapper instead of
+// calling localStorage directly.
+const storage = {
+  get(key){ try { return localStorage.getItem(key); } catch (e) { return null; } },
+  set(key, val){ try { localStorage.setItem(key, val); } catch (e) {} },
+  remove(key){ try { localStorage.removeItem(key); } catch (e) {} }
+};
+
 // entry_type is never shown or chosen on the form — it's an internal
 // distinction for us, not something a submitter should have to think about.
 // Staff doing the paper-to-digital goal transcription open the form with
@@ -618,10 +631,10 @@ const ENTRY_TYPE_KEY = 'cmfi-entrytype-v1';
 const urlEntryType = new URLSearchParams(location.search).get('entry');
 let entryType = urlEntryType === 'goal' || urlEntryType === 'result'
   ? urlEntryType
-  : (localStorage.getItem(ENTRY_TYPE_KEY) === 'goal' ? 'goal' : 'result');
+  : (storage.get(ENTRY_TYPE_KEY) === 'goal' ? 'goal' : 'result');
 function applyEntryType(t){
   entryType = t === 'goal' ? 'goal' : 'result';
-  try { localStorage.setItem(ENTRY_TYPE_KEY, entryType); } catch (e) {}
+  storage.set(ENTRY_TYPE_KEY, entryType);
 }
 applyEntryType(entryType);
 
@@ -770,15 +783,13 @@ let draftTimer;
 function saveDraft(){
   clearTimeout(draftTimer);
   draftTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(collect()));
-      const d = $('#draft');
-      d.dataset.on = 'true';
-      setTimeout(() => { d.dataset.on = 'false'; }, 1800);
-    } catch (e) {}
+    storage.set(DRAFT_KEY, JSON.stringify(collect()));
+    const d = $('#draft');
+    d.dataset.on = 'true';
+    setTimeout(() => { d.dataset.on = 'false'; }, 1800);
   }, 700);
 }
-function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+function clearDraft(){ storage.remove(DRAFT_KEY); }
 
 function say(msg, tone){ const s = $('#status'); s.textContent = msg; s.dataset.tone = tone || ''; }
 $('#beginBtn').addEventListener('click', () => $('#ident').scrollIntoView({ block:'start' }));
@@ -936,7 +947,7 @@ document.addEventListener('change', () => { refreshRail(); saveDraft(); });
 
 applyLang(lang);
 try {
-  const saved = localStorage.getItem(DRAFT_KEY);
+  const saved = storage.get(DRAFT_KEY);
   if (saved) { restore(JSON.parse(saved)); refreshRail(); }
 } catch (e) {}
 refreshRail();
