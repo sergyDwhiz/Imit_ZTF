@@ -192,6 +192,15 @@ export default async (req) => {
   }
 
   if (req.method === 'GET') {
+    // Same guard as people.mjs and export.mjs. This route returns every
+    // member's name, phone, locality and province, and was the only one
+    // reading member data without a token. Nothing in the site calls it —
+    // index.html only ever POSTs here — so nothing breaks by closing it.
+    const token = new URL(req.url).searchParams.get('token');
+    if (!process.env.MIGRATE_TOKEN || token !== process.env.MIGRATE_TOKEN) {
+      return json({ error: 'forbidden' }, 403);
+    }
+
     const limit = Math.min(
       parseInt(new URL(req.url).searchParams.get('limit'), 10) || 100,
       500
