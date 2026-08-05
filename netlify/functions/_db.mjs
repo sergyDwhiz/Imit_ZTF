@@ -116,6 +116,71 @@ const TRISTATE = new Set(['giving_faithful', 'has_savings', 'is_indebted']);
 
 const TEXT_LIMIT = 4000;
 
+// Every bound the database enforces, restated here so a value that would
+// break a CHECK is caught while we still know which question it came from.
+// Postgres only tells us the constraint name after the fact, and only for
+// the first failure; the submitter needs the field, not the constraint.
+//
+// The upper bounds are not decoration. INTEGER stops at 2147483647, and a
+// phone number typed into a counting box clears that easily, which is one
+// of the two ways submissions were being lost. NUMERIC(5,2) with a 0-100
+// CHECK is the other: the paper form labels the box only "Pourcentage (%)"
+// and a member who gives 5000 FCFA writes 5000.
+const INT_MAX = 2147483647;
+const RANGES = {
+  trimester_number: [0, 4],
+  month_from: [1, 12],
+  month_to: [1, 12],
+  giving_percentage: [0, 100],
+  // NUMERIC(14,2): twelve digits before the decimal point.
+  savings_amount: [0, 999999999999.99],
+  debt_amount: [0, 999999999999.99],
+  debt_reimbursed: [0, 999999999999.99]
+};
+for (const column of INTEGERS) if (!RANGES[column]) RANGES[column] = [0, INT_MAX];
+
+// Free-text columns the schema pins to a fixed vocabulary. The form uses a
+// dropdown, so these should never fail — but "should never" is what the
+// giving percentage looked like too, and an unexpected value here is the
+// same silent 500.
+const ENUMS = {
+  entry_type: ['goal', 'result'],
+  acct_frequency: ['day', 'week', 'month']
+};
+
+// Returns the first problem found, or null. Shape is deliberately small and
+// serialisable: the client needs the field name to focus the right input and
+// the bounds to tell the member what to type instead.
+export function validateRow(row) {
+  for (const [column, [min, max]] of Object.entries(RANGES)) {
+    const value = row[column];
+    if (value === null || value === undefined) continue;
+    if (value < min || value > max) {
+      return { field: column, reason: 'out_of_range', min, max, received: value };
+    }
+  }
+  for (const [column, allowed] of Object.entries(ENUMS)) {
+    const value = row[column];
+    if (value === null || value === undefined) continue;
+    if (!allowed.includes(value)) {
+      return { field: column, reason: 'not_allowed', allowed, received: value };
+    }
+  }
+  return null;
+}
+
+// Last line of defence. If a constraint still fires — because the schema
+// moved and this file did not — recover the column from the constraint name
+// so the member is told which line to fix instead of being handed a blank
+// "something went wrong on our side".
+export function fieldFromDbError(err) {
+  const name = err?.constraint_name || err?.constraint || '';
+  const match = /^accountability_returns_(.+?)_check$/.exec(name);
+  if (match && COLUMNS.includes(match[1])) return match[1];
+  if (err?.column_name && COLUMNS.includes(err.column_name)) return err.column_name;
+  return null;
+}
+
 export function coerce(column, raw) {
   if (column === 'literature') {
     const rows = Array.isArray(raw) ? raw : [];

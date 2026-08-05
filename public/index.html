@@ -236,25 +236,25 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
       <div class="block-body">
         <div class="section-label" data-i18n="identLabel">Identification</div>
         <div class="row">
-          <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" autocomplete="name"></label>
+          <label class="f"><span class="f-l" data-i18n="name">Name</span><input class="f-i" name="full_name" data-i18n-ph="phName" autocomplete="name"></label>
         </div>
         <div id="phoneFields">
           <div class="row">
             <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone_cc"></select></label>
-            <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone_local" type="tel" inputmode="tel" autocomplete="tel"></label>
+            <label class="f"><span class="f-l" data-i18n="phone">Phone</span><input class="f-i" name="phone_local" data-i18n-ph="phPhone" type="tel" inputmode="tel" autocomplete="tel"></label>
           </div>
           <p class="hint" data-i18n="phoneHint">Your phone number links this report to your next one. Please use the same number every time.</p>
           <div class="row">
             <label class="f sm"><span class="f-l" data-i18n="phoneCode">Country code</span><select class="f-i cc" name="phone2_cc"></select></label>
-            <label class="f"><span class="f-l" data-i18n="phone2">Second phone number (optional)</span><input class="f-i" name="phone2_local" type="tel" inputmode="tel" autocomplete="tel"></label>
+            <label class="f"><span class="f-l" data-i18n="phone2">Second phone number (optional)</span><input class="f-i" name="phone2_local" data-i18n-ph="phPhone" type="tel" inputmode="tel" autocomplete="tel"></label>
           </div>
           <p class="hint" data-i18n="phone2Hint">If you sometimes use a different number, add it here too — either one will find your record next time.</p>
         </div>
         <label class="tick" style="margin-bottom:1.2rem"><input type="checkbox" name="no_phone" id="noPhoneCheck"><span class="box"></span><span data-i18n="noPhone">I don't have any phone at all</span></label>
         <p class="hint" id="noPhoneHint" data-i18n="noPhoneHint" hidden>Without a phone, your locality is used instead to find your record next time — please fill it in carefully and the same way each time.</p>
         <div class="row">
-          <label class="f"><span class="f-l" data-i18n="locality">Locality</span><input class="f-i" name="locality"></label>
-          <label class="f"><span class="f-l" data-i18n="province">Spiritual province or nation</span><input class="f-i" name="spiritual_province"></label>
+          <label class="f"><span class="f-l" data-i18n="locality">Locality</span><input class="f-i" name="locality" data-i18n-ph="phLocality"></label>
+          <label class="f"><span class="f-l" data-i18n="province">Spiritual province or nation</span><input class="f-i" name="spiritual_province" data-i18n-ph="phProvince"></label>
         </div>
         <div class="row">
           <label class="f sm"><span class="f-l" data-i18n="trimester">Trimester</span>
@@ -274,7 +274,7 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
         <label class="tick"><input type="checkbox" name="acct_service_to_god"><span class="box"></span><span data-i18n="a4">My service to God</span></label>
       </div>
       <div class="row">
-        <label class="f"><span class="f-l" data-i18n="givenTo">To</span><input class="f-i" name="acct_given_to"></label>
+        <label class="f"><span class="f-l" data-i18n="givenTo">To</span><input class="f-i" name="acct_given_to" data-i18n-ph="phGivenTo"></label>
         <label class="f sm"><span class="f-l" data-i18n="every">Every</span><select class="f-i freq" name="acct_frequency"></select></label>
       </div>
     </div></section>
@@ -282,22 +282,22 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
     <section class="block item" id="i2"><div class="item-n">02</div><div class="item-b">
       <h2><span class="n-inline">02</span><span data-i18n="h2t">Daily dynamic encounters with God</span></h2>
       <div class="row">
-        <label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="ddeg_number"></label>
-        <label class="f"><span class="f-l" data-i18n="time">Time</span><input class="f-i" name="ddeg_time"></label>
+        <label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="ddeg_number" data-i18n-ph="phCount"></label>
+        <label class="f"><span class="f-l" data-i18n="time">Time</span><input class="f-i" name="ddeg_time" data-i18n-ph="phTime"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i3"><div class="item-n">03</div><div class="item-b">
       <h2><span class="n-inline">03</span><span data-i18n="h3t">Bible reading</span></h2>
       <div class="row">
-        <label class="f sm"><span class="f-l" data-i18n="chapters">Chapters read</span><input class="f-i" name="bible_chapters"></label>
-        <label class="f"><span class="f-l" data-i18n="timeReading">Time spent reading</span><input class="f-i" name="bible_time"></label>
+        <label class="f sm"><span class="f-l" data-i18n="chapters">Chapters read</span><input class="f-i" name="bible_chapters" data-i18n-ph="phCount"></label>
+        <label class="f"><span class="f-l" data-i18n="timeReading">Time spent reading</span><input class="f-i" name="bible_time" data-i18n-ph="phTime"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i4"><div class="item-n">04</div><div class="item-b">
       <h2><span class="n-inline">04</span><span data-i18n="h4t">Bible memorisation</span></h2>
-      <div class="row"><label class="f lg"><span class="f-l" data-i18n="passages">Passages memorised</span><input class="f-i" name="bible_memorisation"></label></div>
+      <div class="row"><label class="f lg"><span class="f-l" data-i18n="passages">Passages memorised</span><input class="f-i" name="bible_memorisation" data-i18n-ph="phMemo"></label></div>
     </div></section>
 
     <section class="block item" id="i5"><div class="item-n">05</div><div class="item-b">
@@ -310,100 +310,100 @@ textarea.f-i:focus{border-color:var(--seal);box-shadow:none}
     <section class="block item" id="i6"><div class="item-n">06</div><div class="item-b">
       <h2><span class="n-inline">06</span><span data-i18n="h6t">Prayer alone</span></h2>
       <div class="row">
-        <label class="f"><span class="f-l" data-i18n="timeAlone">Time spent praying alone</span><input class="f-i" name="prayer_alone_time"></label>
-        <label class="f sm"><span class="f-l" data-i18n="retreats">15 minute retreats</span><input class="f-i" name="retreats_15min"></label>
+        <label class="f"><span class="f-l" data-i18n="timeAlone">Time spent praying alone</span><input class="f-i" name="prayer_alone_time" data-i18n-ph="phTime"></label>
+        <label class="f sm"><span class="f-l" data-i18n="retreats">15 minute retreats</span><input class="f-i" name="retreats_15min" data-i18n-ph="phCount"></label>
       </div>
       <div class="row">
-        <label class="f sm"><span class="f-l" data-i18n="thanks">Thanksgiving topics recorded</span><input class="f-i" name="thanksgiving_topics"></label>
-        <label class="f sm"><span class="f-l" data-i18n="topics">Prayer topics recorded</span><input class="f-i" name="prayer_topics"></label>
-        <label class="f sm"><span class="f-l" data-i18n="answered">Prayers answered</span><input class="f-i" name="prayers_answered"></label>
+        <label class="f sm"><span class="f-l" data-i18n="thanks">Thanksgiving topics recorded</span><input class="f-i" name="thanksgiving_topics" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="topics">Prayer topics recorded</span><input class="f-i" name="prayer_topics" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="answered">Prayers answered</span><input class="f-i" name="prayers_answered" data-i18n-ph="phCount"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i7"><div class="item-n">07</div><div class="item-b">
       <h2><span class="n-inline">07</span><span data-i18n="h7t">Prayer with others, the house church or the local church</span></h2>
-      <div class="row"><label class="f lg"><span class="f-l" data-i18n="h7l">Frequency, duration and setting</span><input class="f-i" name="prayer_with_others"></label></div>
+      <div class="row"><label class="f lg"><span class="f-l" data-i18n="h7l">Frequency, duration and setting</span><input class="f-i" name="prayer_with_others" data-i18n-ph="phCount"></label></div>
     </div></section>
 
     <section class="block item" id="i8"><div class="item-n">08</div><div class="item-b">
       <h2><span class="n-inline">08</span><span data-i18n="h8t">Soul winning</span></h2>
       <div class="row">
-        <label class="f sm"><span class="f-l" data-i18n="reached">People reached with the gospel</span><input class="f-i" name="people_reached"></label>
-        <label class="f sm"><span class="f-l" data-i18n="conv">Conversions</span><input class="f-i" name="conversions"></label>
-        <label class="f sm"><span class="f-l" data-i18n="bapW">Baptised in water</span><input class="f-i" name="baptised_water"></label>
-        <label class="f sm"><span class="f-l" data-i18n="bapH">Baptised in the Holy Spirit</span><input class="f-i" name="baptised_holy_spirit"></label>
-        <label class="f sm"><span class="f-l" data-i18n="added">Added to the church</span><input class="f-i" name="added_to_church"></label>
-        <label class="f sm"><span class="f-l" data-i18n="planted">Churches planted</span><input class="f-i" name="churches_planted"></label>
-        <label class="f"><span class="f-l" data-i18n="perChurch">Members per church</span><input class="f-i" name="members_per_church"></label>
+        <label class="f sm"><span class="f-l" data-i18n="reached">People reached with the gospel</span><input class="f-i" name="people_reached" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="conv">Conversions</span><input class="f-i" name="conversions" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="bapW">Baptised in water</span><input class="f-i" name="baptised_water" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="bapH">Baptised in the Holy Spirit</span><input class="f-i" name="baptised_holy_spirit" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="added">Added to the church</span><input class="f-i" name="added_to_church" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="planted">Churches planted</span><input class="f-i" name="churches_planted" data-i18n-ph="phCount"></label>
+        <label class="f"><span class="f-l" data-i18n="perChurch">Members per church</span><input class="f-i" name="members_per_church" data-i18n-ph="phCount"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i9"><div class="item-n">09</div><div class="item-b">
       <h2><span class="n-inline">09</span><span data-i18n="h9t">Fasts</span></h2>
       <div class="row">
-        <label class="f sm"><span class="f-l" data-i18n="wed">Wednesday fasts</span><input class="f-i" name="fasts_wednesday"></label>
-        <label class="f sm"><span class="f-l" data-i18n="complete">Complete fasts of 3 days or more</span><input class="f-i" name="fasts_complete_3days"></label>
-        <label class="f sm"><span class="f-l" data-i18n="encouraged">People you encouraged to fast</span><input class="f-i" name="people_encouraged_to_fast"></label>
+        <label class="f sm"><span class="f-l" data-i18n="wed">Wednesday fasts</span><input class="f-i" name="fasts_wednesday" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="complete">Complete fasts of 3 days or more</span><input class="f-i" name="fasts_complete_3days" data-i18n-ph="phCount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="encouraged">People you encouraged to fast</span><input class="f-i" name="people_encouraged_to_fast" data-i18n-ph="phCount"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i10"><div class="item-n">10</div><div class="item-b">
       <h2><span class="n-inline">10</span><span data-i18n="h10t">Proclamation of the prophecy</span></h2>
       <p class="hint" data-i18n="h10h">The entire prophecy of the overthrow of the satanic prince of Cameroon.</p>
-      <div class="row"><label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="prophecy_proclamations"></label></div>
+      <div class="row"><label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="prophecy_proclamations" data-i18n-ph="phCount"></label></div>
     </div></section>
 
     <section class="block item" id="i11"><div class="item-n">11</div><div class="item-b">
       <h2><span class="n-inline">11</span><span data-i18n="h11t">Finances</span></h2>
       <div class="section-label" data-i18n="giving">Giving to God</div>
       <div class="row">
-        <label class="f sm"><span class="f-l" data-i18n="pct">Percentage (%)</span><input class="f-i" name="giving_percentage"></label>
+        <label class="f sm"><span class="f-l" data-i18n="pct">Percentage (%)</span><input class="f-i" name="giving_percentage" data-i18n-ph="phPct"></label>
         <label class="f sm"><span class="f-l" data-i18n="faithful">Faithfulness</span><select class="f-i yesno" name="giving_faithful"></select></label>
       </div>
       <div class="section-label" style="margin-top:1.7rem" data-i18n="savings">Savings</div>
       <div class="row">
         <label class="f sm"><span class="f-l" data-i18n="hasSav">Do you have savings?</span><select class="f-i yesno" name="has_savings"></select></label>
-        <label class="f sm"><span class="f-l" data-i18n="howMuch">How much (FCFA)</span><input class="f-i" name="savings_amount"></label>
+        <label class="f sm"><span class="f-l" data-i18n="howMuch">How much (FCFA)</span><input class="f-i" name="savings_amount" data-i18n-ph="phMoney"></label>
       </div>
       <div class="section-label" style="margin-top:1.7rem" data-i18n="debts">Debts</div>
       <div class="row">
         <label class="f sm"><span class="f-l" data-i18n="indebted">Are you indebted?</span><select class="f-i yesno" name="is_indebted"></select></label>
-        <label class="f sm"><span class="f-l" data-i18n="debtAmt">If yes, how much (FCFA)</span><input class="f-i" name="debt_amount"></label>
-        <label class="f sm"><span class="f-l" data-i18n="reimb">Reimbursed so far (FCFA)</span><input class="f-i" name="debt_reimbursed"></label>
+        <label class="f sm"><span class="f-l" data-i18n="debtAmt">If yes, how much (FCFA)</span><input class="f-i" name="debt_amount" data-i18n-ph="phMoney"></label>
+        <label class="f sm"><span class="f-l" data-i18n="reimb">Reimbursed so far (FCFA)</span><input class="f-i" name="debt_reimbursed" data-i18n-ph="phMoney"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i12"><div class="item-n">12</div><div class="item-b">
       <h2><span class="n-inline">12</span><span data-i18n="h12t">Bertoua message</span></h2>
       <div class="row">
-        <label class="f"><span class="f-l" data-i18n="units">Teaching units completed and marked</span><input class="f-i" name="bertoua_units_completed"></label>
-        <label class="f"><span class="f-l" data-i18n="times">Number of times you did them</span><input class="f-i" name="bertoua_times_done"></label>
+        <label class="f"><span class="f-l" data-i18n="units">Teaching units completed and marked</span><input class="f-i" name="bertoua_units_completed" data-i18n-ph="phCount"></label>
+        <label class="f"><span class="f-l" data-i18n="times">Number of times you did them</span><input class="f-i" name="bertoua_times_done" data-i18n-ph="phCount"></label>
       </div>
     </div></section>
 
     <section class="block item" id="i13"><div class="item-n">13</div><div class="item-b">
       <h2><span class="n-inline">13</span><span data-i18n="h13t">Uprooting of idols</span></h2>
-      <div class="row"><label class="f sm"><span class="f-l" data-i18n="idols">Idols uprooted</span><input class="f-i" name="idols_uprooted"></label></div>
+      <div class="row"><label class="f sm"><span class="f-l" data-i18n="idols">Idols uprooted</span><input class="f-i" name="idols_uprooted" data-i18n-ph="phCount"></label></div>
     </div></section>
 
     <section class="block item" id="i14"><div class="item-n">14</div><div class="item-b">
       <h2><span class="n-inline">14</span><span data-i18n="h14t">Proclamations</span></h2>
-      <div class="row"><label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="proclamations"></label></div>
+      <div class="row"><label class="f sm"><span class="f-l" data-i18n="number">Number</span><input class="f-i" name="proclamations" data-i18n-ph="phCount"></label></div>
     </div></section>
 
     <section class="block item" id="i15"><div class="item-n">15</div><div class="item-b">
       <h2><span class="n-inline">15</span><span data-i18n="h15t">Your involvement in the five year goal</span></h2>
-      <textarea class="f-i" name="five_year_goal" rows="5"></textarea>
+      <textarea class="f-i" name="five_year_goal" data-i18n-ph="phText" rows="5"></textarea>
     </div></section>
 
     <section class="block item" id="i16"><div class="item-n">16</div><div class="item-b">
       <h2><span class="n-inline">16</span><span data-i18n="h16t">Distinct service to God and to man</span></h2>
-      <textarea class="f-i" name="distinct_service" rows="5"></textarea>
+      <textarea class="f-i" name="distinct_service" data-i18n-ph="phText" rows="5"></textarea>
     </div></section>
 
     <section class="block item" id="i17"><div class="item-n">17</div><div class="item-b">
       <h2><span class="n-inline">17</span><span data-i18n="h17t">Making of disciples</span></h2>
-      <textarea class="f-i" name="making_disciples" rows="5"></textarea>
+      <textarea class="f-i" name="making_disciples" data-i18n-ph="phText" rows="5"></textarea>
     </div></section>
 
   </main>
@@ -542,6 +542,22 @@ const I18N = {
     errPhone:"Enter your phone number before submitting — it's what links this report to your next one.",
     errLocality:"Enter your locality before submitting — without a phone, it's what links this report to your next one.",
     errNet:"The form could not be sent. Check your connection and try again. Your answers are still here.",
+    phCount:"e.g. 12",
+    phTime:"e.g. 30 min a day",
+    phPct:"e.g. 10 (a number from 0 to 100, not an amount)",
+    phMoney:"e.g. 25000",
+    phName:"First name and surname",
+    phPhone:"6XX XX XX XX",
+    phLocality:"e.g. Yaounde",
+    phProvince:"e.g. Cameroun",
+    phGivenTo:"Name of the person you give accounts to",
+    phMemo:"e.g. Psalm 23, Romans 8",
+    phText:"In a few words",
+    errTooBig:"\u00ab {label} \u00bb: that number is too large. Check you have not typed a phone number or an amount in this box.",
+    errRange:"\u00ab {label} \u00bb: enter a number between {min} and {max}. Your answers are still here.",
+    errPct:"\u00ab {label} \u00bb: this is a percentage, so a number from 0 to 100. If you wrote an amount in FCFA, replace it with the percentage you give.",
+    errChoice:"\u00ab {label} \u00bb: choose one of the options offered.",
+    errField:"\u00ab {label} \u00bb was refused. Please check that line and try again. Your answers are still here.",
     errServer:"Something went wrong on our end — this isn't a connection problem. Please try submitting again; your answers are still here.",
     months:["January","February","March","April","May","June","July","August","September","October","November","December"]
   },
@@ -597,6 +613,22 @@ const I18N = {
     errPhone:"Entrez votre numéro de téléphone avant d'envoyer — c'est ce qui relie cette fiche à la prochaine.",
     errLocality:"Entrez votre localité avant d'envoyer — sans téléphone, c'est ce qui relie cette fiche à la prochaine.",
     errNet:"La fiche n'a pas pu être envoyée. Vérifiez votre connexion et réessayez. Vos réponses sont conservées.",
+    phCount:"ex : 12",
+    phTime:"ex : 30 min par jour",
+    phPct:"ex : 10 (un nombre de 0 \u00e0 100, pas un montant)",
+    phMoney:"ex : 25000",
+    phName:"Pr\u00e9nom et nom",
+    phPhone:"6XX XX XX XX",
+    phLocality:"ex : Yaound\u00e9",
+    phProvince:"ex : Cameroun",
+    phGivenTo:"Nom de la personne \u00e0 qui vous rendez compte",
+    phMemo:"ex : Psaume 23, Romains 8",
+    phText:"En quelques mots",
+    errTooBig:"\u00ab {label} \u00bb : ce nombre est trop grand. V\u00e9rifiez que vous n'avez pas saisi un num\u00e9ro de t\u00e9l\u00e9phone ou un montant dans cette case.",
+    errRange:"\u00ab {label} \u00bb : entrez un nombre entre {min} et {max}. Vos r\u00e9ponses sont conserv\u00e9es.",
+    errPct:"\u00ab {label} \u00bb : c'est un pourcentage, donc un nombre de 0 \u00e0 100. Si vous avez \u00e9crit un montant en FCFA, remplacez-le par le pourcentage que vous donnez.",
+    errChoice:"\u00ab {label} \u00bb : choisissez l'une des options propos\u00e9es.",
+    errField:"\u00ab {label} \u00bb a \u00e9t\u00e9 refus\u00e9. V\u00e9rifiez cette ligne et r\u00e9essayez. Vos r\u00e9ponses sont conserv\u00e9es.",
     errServer:"Une erreur s'est produite de notre côté — ce n'est pas un problème de connexion. Veuillez réessayer d'envoyer ; vos réponses sont conservées.",
     months:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
   }
@@ -902,6 +934,40 @@ async function submitReturn(extra){
     say(mapped[1], 'bad');
     const field = $('[name="' + mapped[0] + '"]');
     if (field) { field.scrollIntoView({ block: 'center' }); field.focus(); }
+    btn.disabled = false;
+    return;
+  }
+
+  // One answer is outside what the sheet accepts. The server names the
+  // column; the question wording is read back out of the page itself so it
+  // matches whichever language is showing and can never drift out of step
+  // with the labels above.
+  if (errBody?.error === 'field_invalid' && errBody.field) {
+    const input = $('[name="' + errBody.field + '"]');
+    const labelEl = input && input.closest('label') && input.closest('label').querySelector('.f-l');
+    const label = labelEl ? labelEl.textContent.trim() : errBody.field;
+
+    let msg;
+    if (errBody.field === 'giving_percentage') {
+      // The single most common mistake: the paper form labels this box only
+      // "Pourcentage (%)", so a member giving 5000 FCFA writes 5000.
+      msg = t.errPct.replace('{label}', label);
+    } else if (errBody.reason === 'out_of_range' && errBody.max >= 2147483647) {
+      // The only way to clear this bound is to put something that is not a
+      // count in a counting box, and a phone number is how it happens.
+      // Quoting the actual limit back at a member helps nobody.
+      msg = t.errTooBig.replace('{label}', label);
+    } else if (errBody.reason === 'out_of_range') {
+      msg = t.errRange.replace('{label}', label)
+                      .replace('{min}', errBody.min).replace('{max}', errBody.max);
+    } else if (errBody.reason === 'not_allowed') {
+      msg = t.errChoice.replace('{label}', label);
+    } else {
+      msg = t.errField.replace('{label}', label);
+    }
+
+    say(msg, 'bad');
+    if (input) { input.scrollIntoView({ block: 'center' }); input.focus(); }
     btn.disabled = false;
     return;
   }
